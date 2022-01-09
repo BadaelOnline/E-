@@ -1,0 +1,31 @@
+
+    "title":"asddsa",
+    "barcode":"asasaddsa",
+    "meta":"meta",
+    "description":"description",
+    "short_des":"short_des",
+    "brand_id":"1",
+    "slug":"slug"
+
+
+
+    //        foreach($sss as $ss){
+    //
+
+    //        if(isset($sss))
+    //        {
+    //            $i=0;
+    //            //insert other traslations for products
+    //            foreach ($sss as $ss)
+    //            {
+    //                $transCategory_arr[$i]=[
+    //                    'name'=>$ss['name'],
+    //                    'slug'=>$ss['slug'],
+    //                    'locale'=>$ss['locale'],
+    //                    'language_id'=>$ss['language_id']
+    //                ];
+    //            $i++;
+    //            }
+    ////         $sss->
+    ////                DB::table('category_translations')->update([$transCategory_arr]);
+    //            }
