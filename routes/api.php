@@ -492,4 +492,27 @@ Route::group(
              {
                  Route::get('get', 'CurrenciesController@getAll');
              });
-        });
+
+     Route::group(['prefix'=>'activity_type','namespace'=>'Activity_Types'],function()
+     {
+         Route::GET('/get','ActivityTypesController@getAll');
+         Route::GET('/get/{id}','ActivityTypesController@getById');
+         Route::POST('/create','ActivityTypesController@create');
+         Route::PUT('/update/{id}','ActivityTypesController@update');
+         Route::PUT('/trash/{id}','ActivityTypesController@trash');
+         Route::PUT('/restore/{id}','ActivityTypesController@restoreTrashed');
+         Route::GET('/trash','ActivityTypesController@getTrashed');
+         Route::DELETE('/delete/{id}','ActivityTypesController@delete');
+     });
+     Route::group(['prefix'=>'plans','namespace'=>'Plans'],function()
+     {
+         Route::GET('/get','PlansController@getAll');
+         Route::GET('/get/{id}','PlansController@getById');
+         Route::POST('/create','PlansController@create');
+         Route::PUT('/update/{id}','PlansController@update');
+         Route::PUT('/trash/{id}','PlansController@trash');
+         Route::PUT('/restore/{id}','PlansController@restoreTrashed');
+         Route::GET('/trash','PlansController@getTrashed');
+         Route::DELETE('/delete/{id}','PlansController@delete');
+     });
+    });
