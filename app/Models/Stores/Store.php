@@ -31,11 +31,10 @@ class Store extends Model
     ];
     protected $table = 'stores';
     protected $fillable = [
-        'section_id', 'loc_id', 'country_id',
-        'gov_id', 'city_id', 'street_id',
-        'offer_id', 'logo', 'rating',
-        'followers', 'delivery', 'edalilyPoint',
-        'socialMedia_id','is_active','is_approve'
+        'currency_id', 'location_id', 'social_media_id',
+        'activity_type_id', 'owner_id', 'street_id',
+        'is_active', 'logo', 'is_approved'
+        ,'is_active'
     ];
     public function getIsActiveAttribute($value)
     {

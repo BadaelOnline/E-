@@ -13,8 +13,13 @@ class Subscription extends Model
 
     protected $primaryKey = 'id';
     protected $table ='subscriptions';
-    protected $fillable=['store_id','plan_id','start_date','end_date','transaction_id'];
-    protected $hidden=['created_at', 'updated_at'];
+    protected $fillable=['store_id','plan_id','start_date','end_date','transaction_id','is_active'];
+    protected $hidden=['created_at', 'updated_at','store_id','plan_id','transaction_id'];
+
+    public function getIsActiveAttribute($value)
+    {
+        return $value == 1 ? 'Active' : 'Not Active';
+    }
 
     public function Transaction()
     {

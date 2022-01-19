@@ -23,6 +23,7 @@ class SubscriptionSeeder extends Seeder
                 'start_date'=>$faker->date('Y-m-d'),
                 'end_date'=>$faker->date('Y-m-d'),
                 'transaction_id'=>$faker->numberBetween(1,5),
+                'is_active'=>$faker->boolean(),
             ]);
         }
     }

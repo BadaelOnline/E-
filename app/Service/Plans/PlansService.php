@@ -161,7 +161,7 @@ class PlansService
     }
     /*__________________________________________________________________*/
     /****  Update plan   ***
-     * @param ActivityTypeRequest $request
+     * @param PlanRequest $request
      * @param $id
      * @return JsonResponse
      */

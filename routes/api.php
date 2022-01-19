@@ -515,4 +515,15 @@ Route::group(
          Route::GET('/trash','PlansController@getTrashed');
          Route::DELETE('/delete/{id}','PlansController@delete');
      });
+     Route::group(['prefix'=>'subscriptions','namespace'=>'Subscription'],function()
+     {
+         Route::GET('/get','SubscriptionsController@getAll');
+         Route::GET('/get/{id}','SubscriptionsController@getById');
+         Route::POST('/create','SubscriptionsController@create');
+         Route::PUT('/update/{id}','SubscriptionsController@update');
+         Route::PUT('/trash/{id}','SubscriptionsController@trash');
+         Route::PUT('/restore/{id}','SubscriptionsController@restoreTrashed');
+         Route::GET('/trash','SubscriptionsController@getTrashed');
+         Route::DELETE('/delete/{id}','SubscriptionsController@delete');
+     });
     });

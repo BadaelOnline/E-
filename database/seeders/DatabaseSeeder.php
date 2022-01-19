@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 //            StoreBrandSeeder::class,
 //            StoreProductSeeder::class,
 //            StoreSectionSeeder::class,
-//            StoreSeeder::class,
+            StoreSeeder::class,
 //            StoreImagesSeeder::class,
 //            ProductsSeeder::class,
 //            StoreSeeder::class,

@@ -18,7 +18,8 @@ class CreateStoresTable extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('currency_id')->index();
-            $table->unsignedBigInteger('reaches_id')->index();
+            $table->unsignedBigInteger('location_id')->index();
+            $table->unsignedBigInteger('social_media_id')->index();
             $table->unsignedBigInteger( 'activity_type_id')->index();
             $table->unsignedBigInteger( 'owner_id')->index();
             $table->boolean('is_active')->default(0);
