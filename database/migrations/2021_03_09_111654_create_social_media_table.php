@@ -15,15 +15,13 @@ class CreateSocialMediaTable extends Migration
     {
         Schema::create('social_media', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->string('phone_number');
-            $table->string('whatsapp_number');
-            $table->string('facebook_account');
-            $table->string( 'instagram_account');
-            $table->string('telegram_number');
-            $table->string( 'email');
-            $table->boolean('is_active');
-            $table->unsignedInteger('reach_id');
+            $table->string('phone_number')->nullable();
+            $table->string('whatsapp_number')->nullable();
+            $table->string('facebook_account')->nullable();
+            $table->string( 'instagram_account')->nullable();
+            $table->string('telegram_number')->nullable();
+            $table->string( 'email')->nullable();
+            $table->boolean('is_active')->nullable();
             $table->timestamps();
         });
     }

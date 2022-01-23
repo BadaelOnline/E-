@@ -3,6 +3,7 @@
 namespace App\Models\Attachments;
 
 use App\Models\Activities\Activity;
+use App\Models\Attachments\Attachment_Type;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,8 +22,5 @@ class Attachment extends Model
     {
         return $this->hasMany(Attachment_Type::class,'attachments_type_id');
     }
-    public function Activity()
-    {
-        return $this->belongsTo(Activity::class,'activity_id');
-    }
+
 }

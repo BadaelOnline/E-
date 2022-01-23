@@ -6,12 +6,14 @@ use App\Models\Brands\Brand;
 use App\Models\Categories\Section;
 use App\Models\Currencies\Currency;
 use App\Models\Images\StoreImage;
+use App\Models\Location\Location;
 use App\Models\Offer\Offer;
 use App\Models\Orders\Order_Details;
 use App\Models\Payment\Payment_Method;
 use App\Models\Plans\Subscription;
 use App\Models\Products\Product;
 use App\Models\Shipping\Shipping_Method;
+use App\Models\SocialMedia\SocialMedia;
 use App\Models\Stores_Orders\Stores_Order;
 use App\Models\User;
 use App\Scopes\StoreScope;
@@ -34,7 +36,7 @@ class Store extends Model
         'currency_id', 'location_id', 'social_media_id',
         'activity_type_id', 'owner_id', 'street_id',
         'is_active', 'logo', 'is_approved'
-        ,'is_active'
+        ,'is_active','section_id'
     ];
     public function getIsActiveAttribute($value)
     {
@@ -137,5 +139,11 @@ class Store extends Model
     }
     public function currency(){
         return $this->belongsTo(Currency::class,'currency_id');
+    }
+    public function SocialMedia(){
+        return $this->belongsTo(SocialMedia::class,'social_media_id');
+    }
+    public function Location(){
+        return $this->belongsTo(Location::class,'location_id');
     }
 }

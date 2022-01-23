@@ -15,12 +15,13 @@ class StoreUserSeeder extends Seeder
      */
     public function run()
     {
-        $faker=Faker::create();
-        for ($i = 1; $i <= 5; $i++) {
-            DB::table('store_users')->insert([
-                'store_id' => $faker->numberBetween(1, 5),
-                'user_id' => $faker->numberBetween(6, 10),
-            ]);
+        for ($store_id = 1; $store_id <= 5; $store_id++) {
+            for ($user_id = 1; $user_id <= 5; $user_id++) {
+                DB::table('store_users')->insert([
+                    'store_id' => $store_id,
+                    'user_id' => $user_id,
+                ]);
             }
+        }
     }
 }

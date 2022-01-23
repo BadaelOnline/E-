@@ -22,6 +22,7 @@ class CreateStoresTable extends Migration
             $table->unsignedBigInteger('social_media_id')->index();
             $table->unsignedBigInteger( 'activity_type_id')->index();
             $table->unsignedBigInteger( 'owner_id')->index();
+            $table->unsignedBigInteger( 'section_id')->index();
             $table->boolean('is_active')->default(0);
             $table->boolean('is_approved')->default(0);
             $table->string( 'logo');

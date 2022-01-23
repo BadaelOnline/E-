@@ -2,24 +2,32 @@
 namespace App\Service\Stores;
 
 use App\Http\Requests\Store\StoreRequest;
-use App\Http\Requests\StoreProduct\StoreProductRequest;
 use App\Models\Stores\Store;
 use App\Models\Stores\StoreTranslation;
 use App\Scopes\BrandScope;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use App\Models\Attachments\Attachment;
+use App\Models\Plans\Subscription;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
 
 class  StoreService
 {
     use GeneralTrait;
     private $storeTranslation;
     private $Store;
-    public function __construct(Store $store ,StoreTranslation $storeTranslation)
+    private $attachment;
+    private $subscription;
+    public function __construct(Store $store ,StoreTranslation $storeTranslation,
+     Attachment $attachment , Subscription $subscription)
     {
         $this->storeModel=$store;
         $this->storeTranslation=$storeTranslation;
+        $this->attachment=$attachment;
+        $this->subscription=$subscription;
         $this->PAGINATION_COUNT=25;
     }
     /****________________   admins dashboard ________________****/
@@ -169,38 +177,27 @@ class  StoreService
     public function create(Request $request)
     {
         try {
-//            $request->validated();
+    //            $request->validated();
       /***  //transformation to collection*////
         $stores = collect($request->store)->all();
+        $attachments = collect($request->attachments)->all();
+        $subscriptions = collect($request->subscriptions)->all();
+        $logo_folder=public_path('images/stores/logo/');
+
+
         DB::beginTransaction();
         /**** // //create the default language's product****/
         $unTransStore_id=$this->storeModel->insertGetId([
-            'loc_id' =>$request['loc_id'],
-            'country_id' =>$request['country_id'],
-            'gov_id' =>$request['gov_id'],
-            'city_id'=>$request['city_id'],
-            'street_id'=>$request['street_id'],
-            'offer_id'=>$request['offer_id'],
-            'socialMedia_id'=>$request['socialMedia_id'],
-            'followers_id'=>$request['followers_id'],
+            'currency_id' =>$request['currency_id'],
+            'location_id' =>$request['location_id'],
+            'social_media_id' =>$request['social_media_id'],
+            'activity_type_id'=>$request['activity_type_id'],
+            'owner_id'=>$request['owner_id'],
+            'section_id'=>$request['section_id'],
             'is_active'=>$request['is_active'],
-            'is_approved'=>$request['is_approved'],
-            'delivery'=>$request['delivery'],
-            'edalilyPoint'=>$request['edalilyPoint'],
-            'rating'=>$request['rating'],
-            'workingHours'=>$request['workingHours'],
-            'logo'=>$request['logo']
+            'is_approved'=>0,
+            'logo'=>$this->upload($request['logo'],$logo_folder)
         ]);
-        $logo = $request->logo;
-            if (isset($logo)) {
-                if ($request->hasFile($logo)) {
-                    //save
-                    $file_extension = $logo->getClientOriginalExtension();
-                    $file_name = time() . $file_extension;
-                    $path = 'images/stores/logo';
-                    $logo->move($path, $file_name);
-                }
-            }
         //check the category and request
         if(isset($stores) && count($stores))
         {
@@ -209,7 +206,7 @@ class  StoreService
             {
                 $transstore_arr[]=[
                     'local'=>$store['local'],
-                    'title' =>$store['title'],
+                    'name' =>$store['name'],
                     'store_id'=>$unTransStore_id
                 ];
             }
@@ -218,6 +215,43 @@ class  StoreService
             if ($request->has('section')) {
                 $store = $this->storeModel->find($unTransStore_id);
                 $store->Section()->syncWithoutDetaching($request->get('section'));
+            }
+            if ($request->has('section')) {
+                $store = $this->storeModel->find($unTransStore_id);
+                $store->Section()->syncWithoutDetaching($request->get('section'));
+            }
+            if ($request->has('attachments')) {
+                if(isset($attachments) && count($attachments))
+                {
+                    $folder=public_path('images/attachments/stores' . '/' . $unTransStore_id . '/');
+                    foreach ($attachments as $attachment)
+                    {
+                        $attachments_arr[]=[
+                            'path'=>$this->upload($attachment['path'],$unTransStore_id,$folder),
+                            'activity_id' =>$attachment['activity_id'],
+                            'attachments_type_id' =>$attachment['attachments_type_id'],
+                            'record_num'=>$unTransStore_id
+                        ];
+                    }
+                    $this->attachment->insert($attachments_arr);
+                }
+            }
+            if ($request->has('subscriptions')) {
+                if(isset($subscriptions) && count($subscriptions))
+                {
+                    foreach ($subscriptions as $subscription)
+                    {
+                         $subscriptions_arr[]=[
+                            'start_date'=>$subscription['start_date'],
+                            'end_date' =>$subscription['end_date'],
+                            'plan_id' =>$subscription['plan_id'],
+                            'transaction_id' =>$subscription['transaction_id'],
+                            'is_active' =>$subscription['is_active'],
+                            'store_id'=>$unTransStore_id
+                        ];
+                    }
+                    $this->subscription->insert($subscriptions_arr);
+                }
             }
             $images = $request->images;
             if ($request->has('images')) {
@@ -251,25 +285,20 @@ class  StoreService
                 $request->request->add(['is_active'=>0]);
             else
                 $request->request->add(['is_active'=>1]);
+            $logo_folder=public_path('images/stores/logo/');
 
             DB::beginTransaction();
             $nStore=$this->storeModel->where('stores.id',$id)
                 ->update([
-                    'loc_id' => $request['loc_id'],
-                    'country_id' => $request['country_id'],
-                    'gov_id' => $request['gov_id'],
-                    'city_id'=>$request['city_id'],
-                    'street_id'=>$request['street_id'],
-                    'offer_id'=>$request['offer_id'],
-                    'socialMedia_id'=>$request['socialMedia_id'],
-                    'followers_id'=>$request['followers_id'],
+                    'currency_id' =>$request['currency_id'],
+                    'location_id' =>$request['location_id'],
+                    'social_media_id' =>$request['social_media_id'],
+                    'activity_type_id'=>$request['activity_type_id'],
+                    'owner_id'=>$request['owner_id'],
+                    'section_id'=>$request['section_id'],
                     'is_active'=>$request['is_active'],
-                    'is_approved'=>$request['is_approved'],
-                    'delivery'=>$request['delivery'],
-                    'edalilyPoint'=>$request['edalilyPoint'],
-                    'rating'=>$request['rating'],
-                    'workingHours'=>$request['workingHours'],
-                    'logo'=>$request['logo'],
+                    'is_approved'=>0,
+                    'logo'=>$this->upload($request['logo'],$logo_folder)
                 ]);
         $stores = collect($request->store)->all();
         //Stores in database
@@ -355,5 +384,16 @@ class  StoreService
         }catch(\Exception $ex){
             return $this->returnError('400',$ex->getMessage());
         }
+    }
+    public function upload($image,$folder)
+    {
+        // $folder = public_path('images/attachments/stores' . '/' . $id . '/');
+        $filename = time() . '.' . $image->getClientOriginalName();
+        //  $imageUrl='images/attachments/stores/' . $id  . '/' .  $filename;
+        if (!File::exists($folder)) {
+            File::makeDirectory($folder, 0775, true, true);
+        }
+        $image->move($folder,$filename);
+        return $filename;
     }
 }

@@ -19,7 +19,7 @@ class CreateLocationsTable extends Migration
             $table->string('address');
             $table->float('latitude');
             $table->float('longitude');
-            $table->unsignedInteger('reach_id');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

@@ -23,6 +23,7 @@ class StoreSeeder extends Seeder
                 'social_media_id' =>  $faker->numberBetween(1,10),
                 'activity_type_id'=>  $faker->numberBetween(1,10),
                 'owner_id'=> $faker->numberBetween(1,10),
+                'section_id'=> $faker->numberBetween(1,10),
                 'is_active'=> $faker->boolean(),
                 'is_approved'=> $faker->boolean(),
                 'logo'=>$faker->sentence(1),

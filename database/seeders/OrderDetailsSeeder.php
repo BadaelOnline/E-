@@ -16,14 +16,16 @@ class OrderDetailsSeeder extends Seeder
     public function run()
     {
         $faker=Faker::create();
-        for ($i = 1; $i <= 5; $i++) {
-            DB::table('order_details')->insert([
-                'store_id' => $faker->numberBetween(1, 5),
-                'order_id' => $faker->numberBetween(1, 5),
-                'product_id' => $faker->numberBetween(1, 5),
-                'price' => $faker->numberBetween(1000, 5000),
-                'qty' => $faker->numberBetween(100, 500),
-            ]);
+        for ($store_id = 1; $store_id <= 5; $store_id++) {
+            for ($order_id = 1; $order_id <= 5; $order_id++) {
+                DB::table('order_details')->insert([
+                    'store_id' => $store_id,
+                    'order_id' => $order_id,
+                    'product_id' => $faker->numberBetween(1, 5),
+                    'price' => $faker->numberBetween(1000, 5000),
+                    'qty' => $faker->numberBetween(100, 500),
+                ]);
+            }
         }
     }
 }

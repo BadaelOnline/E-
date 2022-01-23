@@ -17,12 +17,13 @@ class ShippingStoreSeeder extends Seeder
     {
         //store_shipping
          $faker=Faker::create();
-        for ($i = 1; $i <= 5; $i++) {
-            DB::table('store_shipping')->insert([
-                'store_id'=>$faker->numberBetween(1,5),
-                'shipping_id'=>$faker->numberBetween(6,10),
-            ]);
+        for ($store_id = 1; $store_id <= 5; $store_id++) {
+            for ($shipping_id = 1; $shipping_id <= 5; $shipping_id++) {
+                DB::table('store_shipping')->insert([
+                    'store_id' => $store_id,
+                    'shipping_id' => $shipping_id,
+                ]);
+            }
         }
-
     }
 }

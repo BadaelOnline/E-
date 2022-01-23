@@ -15,13 +15,14 @@ class TransactionSeeder extends Seeder
      */
     public function run()
     {
-        $faker=Faker::create();
-        for ($i = 1; $i <= 5; $i++) {
-            DB::table('transactions')->insert([
-                'payment_method_id'=>$faker->numberBetween(1,5),
-                'total'=>$faker->numberBetween(1100,2000),
+        for ($payment_method_id = 1; $payment_method_id <= 5; $payment_method_id++) {
+            for ($total = 1; $total <= 5; $total++) {
+                DB::table('transactions')->insert([
+                    'payment_method_id' => $payment_method_id,
+                    'total' => $total,
 
-            ]);
+                ]);
+            }
         }
     }
 }

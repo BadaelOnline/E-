@@ -26,37 +26,33 @@ class AttachmentService
         $this->attachmentModel = $attachment;
         $this->PAGINATION_COUNT = 25;
     }
-    /****Get All Currencies  ****/
+    /****Get All attachment  ****/
     public function getAll()
     {
-//        try {
-//            Gate::authorize('Read Brand');
-        $currencies = $this->attachmentModel->get();
-        if (count($currencies) > 0) {
-            return $this->returnData('Currency', $currencies, 'done');
+       try {
+        $attachments = $this->attachmentModel->get();
+        if (count($attachments) > 0) {
+            return $this->returnData('attachment', $attachments, 'done');
         } else {
-            return $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet');
+            return $this->returnSuccessMessage('attachment', 'attachment doesnt exist yet');
         }
-
-
-//        } catch (\Exception $ex) {
-//            return $this->returnError('400', $ex->getMessage());
-//        }
+       } catch (\Exception $ex) {
+           return $this->returnError('400', $ex->getMessage());
+       }
     }
     /*__________________________________________________________________*/
-    /****Get Active Product By ID  ***
+    /****Get Active attachment By ID  ***
      * @param $id
      * @return JsonResponse
      */
     public function getById($id)
     {
         try {
-            Gate::authorize('Read Brand');
-            $brand = $this->attachmentModel->with('Product')->findOrFail($id);
+            $attachment = $this->attachmentModel->findOrFail($id);
             if (!isset($brand)) {
-                return $response = $this->returnSuccessMessage('This Brand not found', 'done');
+                return  $this->returnSuccessMessage('This attachment not found', 'done');
             }
-            return $response = $this->returnData('Brand', $brand, 'done');
+            return $this->returnData('attachment', $attachment, 'done');
         } catch (\Exception $ex) {
             if ($ex instanceof TokenExpiredException){
                 return $this->returnError('400', $ex->getMessage());
@@ -66,41 +62,37 @@ class AttachmentService
         }
     }
     /*__________________________________________________________________*/
-    /****ــــــ This Functions For Trashed Productsــــــ  ****/
-    /****Get All Trashed Products Or By ID  ****/
+    /****ــــــ This Functions For Trashed attachment  ****/
+    /****Get All Trashed attachment Or By ID  ****/
     public function getTrashed()
     {
         try {
-            Gate::authorize('Read Brand');
+            $attachment = $this->attachmentModel->where('is_active', 0)->get();
 
-            $brand = $this->attachmentModel->where('is_active', 0)->get();
-
-            if (count($brand) > 0) {
-                return $this->returnData('Brand', $brand, 'done');
+            if (count($attachment) > 0) {
+                return $this->returnData('attachment', $attachment, 'done');
             } else {
-                return $this->returnSuccessMessage('Brand', 'Brands trashed doesnt exist yet');
+                return $this->returnSuccessMessage('attachment', 'attachments trashed doesnt exist yet');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
     /*__________________________________________________________________*/
-    /****Restore Products Fore Active status  ***
+    /****Restore attachment Fore Active status  ***
      * @param $id
      * @return JsonResponse
      */
     public function restoreTrashed($id)
     {
         try {
-            Gate::authorize('Restore Brand');
-
-            $brand = $this->attachmentModel->find($id);
-            if (is_null($brand)) {
-                return $response = $this->returnSuccessMessage('Brand', 'This Products not found');
+            $attachment = $this->attachmentModel->find($id);
+            if (is_null($attachment)) {
+                return $response = $this->returnSuccessMessage('attachment', 'This attachment not found');
             } else {
-                $brand->is_active = true;
-                $brand->save();
-                return $this->returnData('Brand', $brand, 'This Brand Is trashed Now');
+                $attachment->is_active = true;
+                $attachment->save();
+                return $this->returnData('attachment', $attachment, 'This attachment Is trashed Now');
             }
         } catch (\Exception $ex) {
             if($ex instanceof AccessDeniedException)
@@ -108,22 +100,20 @@ class AttachmentService
         }
     }
     /*__________________________________________________________________*/
-    /****   Product's Soft Delete   ***
+    /****   attachment's Soft Delete   ***
      * @param $id
      * @return JsonResponse
      */
     public function trash($id)
     {
         try {
-            Gate::authorize('Delete Brand');
-
-            $brand = $this->attachmentModel->find($id);
-            if (is_null($brand)) {
-                return $response = $this->returnSuccessMessage('Brand', 'This Brands not found');
+            $attachment = $this->attachmentModel->find($id);
+            if (is_null($attachment)) {
+                return $this->returnSuccessMessage('attachment', 'This attachments not found');
             } else {
-                $brand->is_active = false;
-                $brand->save();
-                return $this->returnData('Brand', $brand, 'This Brand Is trashed Now');
+                $attachment->is_active = false;
+                $attachment->save();
+                return $this->returnData('attachment', $attachment, 'This attachment Is trashed Now');
             }
 
         } catch (\Exception $ex) {
@@ -131,39 +121,36 @@ class AttachmentService
         }
     }
     /*__________________________________________________________________*/
-    /****  Create Products   ***
+    /****  Create attachment   ***
      * @return JsonResponse
      */
     public function create(BrandRequest $request)
     {
         try {
-
-            Gate::authorize('Create Brand');
-
-            $validated = $request->validated();
+            // $validated = $request->validated();
             $request->is_active ? $is_active = true : $is_active = false;
             /** transformation to collection */
-            $allbrands = collect($request->brand)->all();
+            $allattachments = collect($request->attachment)->all();
             $folder = public_path('images/brands' . '/');
             DB::beginTransaction();
             // //create the default language's brand
-            $unTransBrand_id = $this->attachmentModel->insertGetId([
+            $unTransattachment_id = $this->attachmentModel->insertGetId([
                 'slug' => $request['slug'],
                 'is_active' => $request['is_active'],
                 'image' => $this->upload( $request['image'],$folder),
             ]);
             //check the Brand and request
-            if (isset($allbrands) && count($allbrands)) {
-                //insert other traslations for Brands
-                foreach ($allbrands as $allbrand) {
+            if (isset($allattachments) && count($allattachments)) {
+                //insert other traslations for attachment
+                foreach ($allattachments as $allattachment) {
                     $transBrand_arr[] = [
-                        'name' => $allbrand ['name'],
-                        'local' => $allbrand['local'],
-                        'description' => $allbrand['description'],
+                        'name' => $allattachment ['name'],
+                        'local' => $allattachment['local'],
+                        'description' => $allattachment['description'],
                         'brand_id' => $unTransBrand_id
                     ];
                 }
-                $this->brandTranslation->insert($transBrand_arr);
+                $this->attachmentTranslation->insert($transBrand_arr);
             }
             DB::commit();
             return $this->returnData('Brand', [$unTransBrand_id,$allbrands], 'done');
@@ -181,22 +168,22 @@ class AttachmentService
     {
         $request->validated();
         try {
-            $brand = $this->attachmentModel->find($id);
-            if (!$brand)
-                return $this->returnError('400', 'not found this Brand');
-            if (!($request->has('brand.is_active')))
+            $attachment = $this->attachmentModel->find($id);
+            if (!$attachment)
+                return $this->returnError('400', 'not found this attachment');
+            if (!($request->has('attachments.is_active')))
                 $request->request->add(['is_active' => 0]);
             else
                 $request->request->add(['is_active' => 1]);
-            $unTransBrand = $this->attachmentModel->where('brands.id', $id)
+            $unTransattachment = $this->attachmentModel->where('attachments.id', $id)
                 ->update([
                     'slug' => $request['slug'],
                     'is_active' => $request['is_active'],
 //                    'image' => $request['image'],
                 ]);
-            $request_brands = array_values($request->brand);
-            foreach ($request_brands as $request_brand) {
-                $this->brandTranslation->where('brand_id', $id)
+            $request_attachments = array_values($request->attachment);
+            foreach ($request_attachments as $request_attachment) {
+                $this->attachmentTranslation->where('attachment_id', $id)
                     ->where('local', $request_brand['local'])
                     ->update([
                         'name' => $request_brand ['name'],
@@ -216,13 +203,11 @@ class AttachmentService
     public function search($title)
     {
         try {
-            Gate::authorize('Read Brand');
-
-            $brand = $this->attachmentModel->searchTitle();
-            if (!$brand) {
-                return $this->returnError('400', 'not found this Brand');
+            $attachment = $this->attachmentModel->searchTitle();
+            if (!$attachment) {
+                return $this->returnError('400', 'not found this attachment');
             } else {
-                return $this->returnData('brands', $brand, 'done');
+                return $this->returnData('attachments', $attachment, 'done');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
@@ -236,14 +221,9 @@ class AttachmentService
     public function delete($id)
     {
         try {
-            Gate::authorize('Delete Brand');
-
-            $brand = $this->attachmentModel->find($id);
-
-            $brand ->destroy($id);
-            return $this->returnData('Brand', $brand, 'This Brand Is deleted Now');
-
-
+            $attachment = $this->attachmentModel->find($id);
+            $attachment ->destroy($id);
+            return $this->returnData('attachment', $attachment, 'This attachment Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }

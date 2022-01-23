@@ -6,7 +6,7 @@ use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class ReachSeeder extends Seeder
+class LocationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,11 +17,12 @@ class ReachSeeder extends Seeder
     {
         $faker=Faker::create();
         for ($i = 1; $i <= 5; $i++) {
-            DB::table('reaches')->insert([
-                'type' => $faker->word(),
-                'location_id' => $faker->numberBetween(1, 5),
-                'social_media_id' => $faker->numberBetween(1, 5),
-                'type_id' => $faker->numberBetween(1, 5),
+            DB::table('locations')->insert([
+                'name'=>$faker->address(),
+                'address'=>$faker->address(),
+                'latitude'=>$faker->latitude(),
+                'longitude'=>$faker->longitude(),
+                'is_active'=>$faker->boolean(),
             ]);
         }
     }
