@@ -16,6 +16,10 @@ class ActivityTypesController extends Controller
     {
         $this->activityTypesServicie=$activityTypesServicie;
     }
+    public function ActivityGet()
+    {
+        return $this->activityTypesServicie->ActivityGet();
+    }
     public function getAll()
     {
         return $this->activityTypesServicie->getAll();

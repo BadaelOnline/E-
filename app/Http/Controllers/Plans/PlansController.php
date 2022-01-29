@@ -46,4 +46,5 @@ class PlansController extends Controller
     public function delete($id)
     {
         return $this->plansService->delete($id);
-    }}
+    }
+}

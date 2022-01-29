@@ -62,6 +62,20 @@ Route::group(
             {
                 Route::Post('/getcheckout','StoresOrderController@getChekOutId');
             });
+        Route::group(['prefix'=>'payments','namespace'=>'PaymentMethod'],function()
+        {
+            Route::get('/get','PaymentMethodsController@getALl');
+            Route::get('/get/{storeId}','PaymentMethodsController@getByStore');
+            Route::post('/assigning/{storeId}','PaymentMethodsController@assigningToStore');
+            Route::post('/delete/{storeId}/{paymentId}','PaymentMethodsController@deleteFromStore');
+        });
+        Route::group(['prefix'=>'shipping','namespace'=>'Shippings'],function()
+        {
+            Route::get('/get','ShippingMethodsController@getALl');
+            Route::get('/get/{storeId}','ShippingMethodsController@getByStore');
+            Route::post('/assigning/{storeId}','ShippingMethodsController@assigningToStore');
+            Route::post('/delete/{storeId}/{paymentId}','ShippingMethodsController@deleteFromStore');
+        });
         /**__________________________ Category routes __________________________**/
         Route::group(['prefix'=>'categories','namespace'=>'Category'],function()
             {
@@ -82,7 +96,7 @@ Route::group(
         /**__________________________ Section routes  __________________________**/
         Route::group(['prefix'=>'sections','namespace'=>'Category'],function()
         {
-            Route::GET('/getAll','SectionsController@getAll')->middleware('can:Read Section');
+            Route::GET('/get','SectionsController@getAll');
             Route::GET('/getCategoryBySection','SectionsController@getCategoryBySection')->middleware('can:Read Section');
             Route::GET('/getById/{id}','SectionsController@getById')->middleware('can:Read Section');
             Route::POST('/create','SectionsController@create')->middleware('can:Create Section');
@@ -139,8 +153,12 @@ Route::group(
                 Route::PUT('/restoreTrashed/{id}','StoreController@restoreTrashed');
                 Route::GET('/search/{name}','StoreController@search');
                 Route::GET('/getTrashed','StoreController@getTrashed');
-                Route::DELETE('/delete/{id}','StoreController@delete');
+                Route::DELETE('/delete/{id}','/account/{storeid}@delete');
                 Route::GET('/getSectionInStore/{id}','StoreController@getSectionInStore');
+                Route::POST('/banners/create/{storeId}','StoreController@createBanner');
+                Route::PUT('/banners/update/{bannerId}/{storeId}','StoreController@updateBanner');
+                Route::GET('/banners/get/{storeId}','StoreController@getBanner');
+                Route::GET('/users/get/{storeId}','StoreController@storeUsers');
 
                 Route::POST('/insertProductToStore','StoresProductsController@insertProductToStore');
                 Route::PUT('/updateProductInStore/{id}','StoresProductsController@updateProductInStore');
@@ -151,6 +169,8 @@ Route::group(
 
                 Route::PUT('/prices/{store_id}','StoresProductsController@updateMultyProductsPricesInStore');
                 Route::PUT('/ratio/{store_id}','StoresProductsController@updatePricesPyRatio');
+                Route::GET('/account/{storeId}','StoreController@account');
+
 
 
 
@@ -488,13 +508,9 @@ Route::group(
                  Route::delete('delete/{id}', 'ProductImageController@delete_image');
                  Route::put('get_is_cover/{pro_id}/{img_id}', 'ProductImageController@get_is_cover');
              });
-             Route::group(['prefix'=>'currencies','namespace'=>'Currencies'],function ()
-             {
-                 Route::get('get', 'CurrenciesController@getAll');
-             });
-
      Route::group(['prefix'=>'activity_type','namespace'=>'Activity_Types'],function()
      {
+         Route::GET('/activity','ActivityTypesController@ActivityGet');
          Route::GET('/get','ActivityTypesController@getAll');
          Route::GET('/get/{id}','ActivityTypesController@getById');
          Route::POST('/create','ActivityTypesController@create');
@@ -525,5 +541,27 @@ Route::group(
          Route::PUT('/restore/{id}','SubscriptionsController@restoreTrashed');
          Route::GET('/trash','SubscriptionsController@getTrashed');
          Route::DELETE('/delete/{id}','SubscriptionsController@delete');
+     });
+     Route::group(['prefix'=>'currencies','namespace'=>'Currencies'],function()
+     {
+         Route::GET('/get','CurrenciesController@getAll');
+         Route::GET('/get/{id}','CurrenciesController@getById');
+         Route::POST('/create','CurrenciesController@create');
+         Route::PUT('/update/{id}','CurrenciesController@update');
+         Route::PUT('/trash/{id}','CurrenciesController@trash');
+         Route::PUT('/restore/{id}','CurrenciesController@restoreTrashed');
+         Route::GET('/trash','CurrenciesController@getTrashed');
+         Route::DELETE('/delete/{id}','CurrenciesController@delete');
+     });
+     Route::group(['prefix'=>'attachments','namespace'=>'Attachment'],function()
+     {
+         Route::GET('/get','AttachmentsController@getAll');
+         Route::GET('/get/{id}','AttachmentsController@getById');
+         Route::POST('/create','AttachmentsController@create');
+         Route::PUT('/update/{id}','AttachmentsController@update');
+         Route::PUT('/trash/{id}','AttachmentsController@trash');
+         Route::PUT('/restore/{id}','AttachmentsController@restoreTrashed');
+         Route::GET('/trash','AttachmentsController@getTrashed');
+         Route::DELETE('/delete/{id}','AttachmentsController@delete');
      });
     });

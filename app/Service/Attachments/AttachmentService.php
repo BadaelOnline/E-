@@ -4,7 +4,6 @@ namespace App\Service\Attachments;
 
 use App\Http\Requests\Brands\BrandRequest;
 use App\Models\Attachments\Attachment;
-use App\Models\Currencies\Currency;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -23,14 +22,14 @@ class AttachmentService
 
     public function __construct(Attachment $attachment)
     {
-        $this->attachmentModel = $attachment;
+        $this->attachment = $attachment;
         $this->PAGINATION_COUNT = 25;
     }
     /****Get All attachment  ****/
     public function getAll()
     {
        try {
-        $attachments = $this->attachmentModel->get();
+        $attachments = $this->attachment->all();
         if (count($attachments) > 0) {
             return $this->returnData('attachment', $attachments, 'done');
         } else {

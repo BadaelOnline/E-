@@ -2,8 +2,6 @@
 
 namespace App\Models\Attachments;
 
-use App\Models\Activities\Activity;
-use App\Models\Attachments\Attachment_Type;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

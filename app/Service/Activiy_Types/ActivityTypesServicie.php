@@ -26,11 +26,15 @@ class ActivityTypesServicie
         $this->activity_typeTranslation = $activity_typeTranslation;
         $this->activity_Type = $activity_Type;
     }
+    public function ActivityGet()
+    {
+        return Config::get('activities.activity');
+    }
+
     /****Get All  activity_Types  ****/
     public function getAll()
     {
         try {
-//            return Config::get('activities.activity');
             $activity_Types = $this->activity_Type->get();
             if (count($activity_Types) > 0) {
                 return $this->returnData('activity_Type', $activity_Types, 'done');

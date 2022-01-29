@@ -21,7 +21,7 @@ class StoreController extends Controller
     }
     /****________________   admins dashboard functions ________________****/
     /****________________   Store's approved ________________****/
-    public function aprrove( $id)
+    public function aprrove($id)
     {
         return $this->StoreService->aprrove($id);
     }
@@ -70,6 +70,26 @@ class StoreController extends Controller
     }
     public function getSectionInStore($id)
     {
-        return  $this->StoreService->getSectionInStore($id);
+        return $this->StoreService->getSectionInStore($id);
+    }
+    public function account($storeId)
+    {
+        return $this->StoreService->account($storeId);
+    }
+    public function createBanner(Request $request,$storeId)
+    {
+        return $this->StoreService->createBanner($request,$storeId);
+    }
+    public function updateBanner(Request $request,$bannerId,$storeId)
+    {
+        return $this->StoreService->updateBanner($request,$bannerId,$storeId);
+    }
+    public function getBanner($storeId)
+    {
+        return $this->StoreService->getBanner($storeId);
+    }
+    public function storeUsers($storeId)
+    {
+        return $this->StoreService->storeUsers($storeId);
     }
 }

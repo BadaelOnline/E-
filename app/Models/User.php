@@ -45,6 +45,11 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verified_at',
+        'is_active',
+        'pivot',
+        'created_at',
+        'updated_at'
     ];
     /**
      * The attributes that should be cast to native types.
@@ -71,11 +76,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-//    protected static function booted()
-//    {
-//        parent::booted();
-//        static::addGlobalScope(new UserScope);
-//    }
     public function UserTranslation()
     {
         return $this->hasMany(UserTranslation::class);

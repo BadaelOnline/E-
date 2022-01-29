@@ -2,6 +2,7 @@
 namespace App\Service\Stores;
 
 use App\Http\Requests\Store\StoreRequest;
+use App\Models\Images\Banner;
 use App\Models\Stores\Store;
 use App\Models\Stores\StoreTranslation;
 use App\Scopes\BrandScope;
@@ -21,13 +22,15 @@ class  StoreService
     private $Store;
     private $attachment;
     private $subscription;
-    public function __construct(Store $store ,StoreTranslation $storeTranslation,
+    private $banner;
+    public function __construct(Store $store ,StoreTranslation $storeTranslation,Banner $banner,
      Attachment $attachment , Subscription $subscription)
     {
         $this->storeModel=$store;
         $this->storeTranslation=$storeTranslation;
         $this->attachment=$attachment;
         $this->subscription=$subscription;
+        $this->banner=$banner;
         $this->PAGINATION_COUNT=25;
     }
     /****________________   admins dashboard ________________****/
@@ -36,13 +39,8 @@ class  StoreService
     {
         try{
             $store=$this->storeModel->find($id);
-            if (is_null($store) ){
-                return $response= $this->returnSuccessMessage('Store','This stores not found');
-            }else{
-                $store->is_approved=true;
-                $store->save();
-                return $this->returnData('Store', $store,'This Store Is aprroved Now');
-            }
+            return $store==null ? $this->returnSuccessMessage('Store','This stores not found'):
+            $this->returnData('Store',$store->update(['is_approved'=>true]) ,'This Store Is Approved Now');
         }catch(\Exception $ex){
             return $this->returnError('400',$ex->getMessage());
         }
@@ -68,11 +66,8 @@ class  StoreService
                 return $q->where('is_cover',1)
                     ->get();}
             ])->get();
-            if (count($store) > 0){
-                return $this->returnData('Stores',$store,'done');
-            }else{
-                return $this->returnSuccessMessage('Store','stores doesnt exist yet');
-            }
+            return count($store) > 0 ? $this->returnData('Stores',$store,'done'):
+            $this->returnSuccessMessage('Store','stores doesnt exist yet');
         } catch(\Exception $ex)
         {
             return $this->returnError('400',$ex->getMessage());
@@ -96,12 +91,9 @@ class  StoreService
                                 ])->get();
                         }])->get();},
                 'StoreImage'=>function($q){
-                return $q->where('is_cover',1)->get();}])->paginate($this->PAGINATION_COUNT);
-            if (count($store) > 0){
-                return $this->returnData('Stores',$store,'done');
-            }else{
-                return $this->returnSuccessMessage('stores doesnt exist yet',200);
-            }
+                return $q->where('is_cover',1)->get();}])->get();
+            return count($store) > 0 ? $this->returnData('Stores',$store,'done'):
+                $this->returnSuccessMessage('Store','stores doesnt exist yet');
         } catch(\Exception $ex){
 
             return $this->returnError('400',$ex->getMessage());
@@ -117,11 +109,8 @@ class  StoreService
                 return $q->where('store_id',$store_id)->get();
             }])->get();
         },'Section','Brand','StoreImage'])->find($store_id);
-            if (is_null($store) ){
-                return $response= $this->returnSuccessMessage('Store','This stores not found');
-            }else{
-                return $this->returnData('Store',$store,'done');
-            }
+            return is_null($store) ? $this->returnSuccessMessage('Store','stores doesnt exist yet'):
+                $this->returnData('Stores',$store,'done');
         }catch(\Exception $ex){
             return $this->returnError('400',$ex->getMessage());
         }
@@ -158,7 +147,7 @@ class  StoreService
         }
     }
     /****________________   Store's Soft Delete   ________________****/
-    public function trash( $id)
+    public function trash($id)
     {
         try{
             $store=$this->storeModel->find($id);
@@ -183,8 +172,6 @@ class  StoreService
         $attachments = collect($request->attachments)->all();
         $subscriptions = collect($request->subscriptions)->all();
         $logo_folder=public_path('images/stores/logo/');
-
-
         DB::beginTransaction();
         /**** // //create the default language's product****/
         $unTransStore_id=$this->storeModel->insertGetId([
@@ -216,10 +203,6 @@ class  StoreService
                 $store = $this->storeModel->find($unTransStore_id);
                 $store->Section()->syncWithoutDetaching($request->get('section'));
             }
-            if ($request->has('section')) {
-                $store = $this->storeModel->find($unTransStore_id);
-                $store->Section()->syncWithoutDetaching($request->get('section'));
-            }
             if ($request->has('attachments')) {
                 if(isset($attachments) && count($attachments))
                 {
@@ -227,7 +210,7 @@ class  StoreService
                     foreach ($attachments as $attachment)
                     {
                         $attachments_arr[]=[
-                            'path'=>$this->upload($attachment['path'],$unTransStore_id,$folder),
+                            'path'=>$this->upload($attachment['path'],$folder),
                             'activity_id' =>$attachment['activity_id'],
                             'attachments_type_id' =>$attachment['attachments_type_id'],
                             'record_num'=>$unTransStore_id
@@ -352,7 +335,8 @@ class  StoreService
         {
             return $this->returnData('Store', $store,'done');
         }
-            }catch(\Exception $ex){
+            }
+            catch(\Exception $ex){
         return $this->returnError('400',$ex->getMessage());
         }
     }
@@ -381,8 +365,67 @@ class  StoreService
             }else {
                 return $this->returnData('Category', $store, 'This Store Is deleted Now');
             }
+        }
+        catch(\Exception $ex){
+            return $this->returnError('400',$ex->getMessage());
+        }
+    }
+    public function account($storeId)
+    {
+        $store=$this->storeModel->find($storeId);
+        return $store;
+    }
+    public function createBanner(Request $request,$storeId)
+    {
+        try{
+//            return $request;
+        $folder = public_path('images/stores/banners' . '/' . $storeId . '/');
+        $banners = collect($request->banners)->all();
+        if(isset($banners) && count($banners))
+        {
+                foreach ($banners as $banner)
+                {
+                    $banners_arr[]=[
+                        'image'=>$this->upload($banner['image'],$folder),
+                        'description'=>$banner['description'],
+                        'store_id'=>$storeId,
+                        'is_active'=>$banner['is_active'],
+                        'is_appear'=>$banner['is_appear']
+                    ];
+                }
+                 $this->banner->insert($banners_arr);
+            }
+            return $this->returnData('Banners', [$banners],'done');
+        }
+      catch(\Exception $ex)
+         {
+            DB::rollback();
+            return $this->returnError('store',$ex->getMessage());
+        }
+    }
+    public function updateBanner(Request $request,$bannerId,$storeId)
+    {
+        try{
+            $folder = public_path('images/stores/banners' . '/' . $storeId . '/');
+             $banner=$this->banner->find($bannerId);
+             $banner->update([
+                 'image'=>$this->upload($request['image'],$folder),
+                 'description'=>$request['description'],
+                 'is_active'=>$request['is_active'],
+                 'is_appear'=>$request['is_appear']
+             ]);
+            return $this->returnData('Banners', $banner,'done');
         }catch(\Exception $ex){
             return $this->returnError('400',$ex->getMessage());
+        }
+    }
+    public function getBanner($storeId)
+    {
+        try{
+            $banner=$this->banner->where('banners.store_id',$storeId)->get();
+        return $this->returnData('Banners', $banner,'done');
+    }catch(\Exception $ex){
+        return $this->returnError('400',$ex->getMessage());
         }
     }
     public function upload($image,$folder)
@@ -396,4 +439,9 @@ class  StoreService
         $image->move($folder,$filename);
         return $filename;
     }
+    public function storeUsers($storeId)
+    {
+        return $this->storeModel->with('User')->find($storeId);
+    }
+
 }

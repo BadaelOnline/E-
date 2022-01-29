@@ -25,7 +25,7 @@ class Store extends Model
     use HasFactory;
     protected $primaryKey = 'id';
     protected $hidden = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at' , 'pivot'
     ];
     protected $casts = [
         'is_active' => 'boolean',

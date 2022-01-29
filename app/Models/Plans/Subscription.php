@@ -20,7 +20,6 @@ class Subscription extends Model
     {
         return $value == 1 ? 'Active' : 'Not Active';
     }
-
     public function Transaction()
     {
         return $this->belongsTo(Transaction::class,'transaction_id');

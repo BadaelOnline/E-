@@ -79,4 +79,8 @@ class AuthController extends Controller
     {
         return $this->authService->register($request);
     }
+    public function get_user(Request $request)
+    {
+        return $this->authService->get_user($request);
+    }
 }
