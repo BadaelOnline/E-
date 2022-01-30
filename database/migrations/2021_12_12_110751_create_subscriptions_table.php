@@ -20,6 +20,7 @@ class CreateSubscriptionsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->unsignedInteger('transaction_id');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

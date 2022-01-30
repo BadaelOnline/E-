@@ -147,13 +147,10 @@ class AuthService
     }
     public function get_user(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
 
         $user = JWTAuth::authenticate($request->token);
 
-        return response()->json(['Employee' => $user]);
+        return response()->json(['User' => $user]);
     }
     /**
      * Get the token array structure.

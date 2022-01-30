@@ -52,12 +52,12 @@ class BrandsService
         }
 
     }
-    /****Get All Active Products  ****/
+    /****Get All Active Brands  ****/
     public function getAll()
     {
         try {
             Gate::authorize('Read Brand');
-                $brands = $this->BrandModel->with(['Product'])->paginate($this->PAGINATION_COUNT);
+                $brands = $this->BrandModel->with(['Product'])->get();
                 if (count($brands) > 0) {
                     return $response = $this->returnData('Brand', $brands, 'done');
                 } else {
@@ -70,7 +70,7 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****Get Active Product By ID  ***
+    /****Get Active Brands By ID  ***
      * @param $id
      * @return JsonResponse
      */
@@ -92,8 +92,8 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****ــــــ This Functions For Trashed Productsــــــ  ****/
-    /****Get All Trashed Products Or By ID  ****/
+    /****ــــــ This Functions For Trashed Brands  ****/
+    /****Get All Trashed Brands Or By ID  ****/
     public function getTrashed()
     {
         try {
@@ -104,14 +104,14 @@ class BrandsService
             if (count($brand) > 0) {
                 return $this->returnData('Brand', $brand, 'done');
             } else {
-                return $this->returnSuccessMessage('Brand', 'Brands trashed doesnt exist yet');
+                return $this->returnSuccessMessage('Brand', 'c trashed doesnt exist yet');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
     /*__________________________________________________________________*/
-    /****Restore Products Fore Active status  ***
+    /****Restore Brands Fore Active status  ***
      * @param $id
      * @return JsonResponse
      */
@@ -122,7 +122,7 @@ class BrandsService
 
             $brand = $this->BrandModel->find($id);
             if (is_null($brand)) {
-                return $response = $this->returnSuccessMessage('Brand', 'This Products not found');
+                return $response = $this->returnSuccessMessage('Brand', 'This Brands not found');
             } else {
                 $brand->is_active = true;
                 $brand->save();
@@ -134,7 +134,7 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****   Product's Soft Delete   ***
+    /****   Brands's Soft Delete   ***
      * @param $id
      * @return JsonResponse
      */
@@ -157,7 +157,7 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****  Create Products   ***
+    /****  Create Brands   ***
      * @return JsonResponse
      */
     public function create(BrandRequest $request)
@@ -199,7 +199,7 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****  Update Product   ***
+    /****  Update Brands   ***
      * @param $id
      * @return JsonResponse
      */
@@ -255,7 +255,7 @@ class BrandsService
         }
     }
     /*__________________________________________________________________*/
-    /****  Delete Product   ***
+    /****  Delete Brands   ***
      * @param $id
      * @return JsonResponse
      */

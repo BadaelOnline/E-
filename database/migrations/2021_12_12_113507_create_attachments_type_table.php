@@ -15,6 +15,7 @@ class CreateAttachmentsTypeTable extends Migration
     {
         Schema::create('attachments_type', function (Blueprint $table) {
             $table->id();
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

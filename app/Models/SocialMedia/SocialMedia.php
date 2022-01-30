@@ -2,6 +2,8 @@
 
 namespace App\Models\SocialMedia;
 
+use App\Models\Location\Location;
+use App\Models\Stores\Store;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,5 +29,8 @@ class SocialMedia extends Model
     public function User()
     {
         return $this->belongsTo(User::class);
+    }
+    public function Store(){
+        return $this->belongsTo(Store::class,'social_media_id');
     }
 }

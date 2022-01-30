@@ -25,10 +25,6 @@ class CurrenciesController extends Controller
 
 
     }
-    public function list()
-    {
-        return $this->currenciesService->list();
-    }
     public function getAll()
     {
         return $this->currenciesService->getAll();

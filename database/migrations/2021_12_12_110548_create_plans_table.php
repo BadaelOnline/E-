@@ -15,8 +15,9 @@ class CreatePlansTable extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->integer('activity_id');
             $table->string('price_per_month');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

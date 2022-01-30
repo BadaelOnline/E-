@@ -17,10 +17,20 @@ class ActivityTypeSeeder extends Seeder
     {
         $faker=Faker::create();
         for ($i = 1; $i <= 5; $i++) {
-            DB::table('activities_type')->insert([
-                'name'=>$faker->word(),
+            $s = DB::table('activities_type')->insertGetId([
+                'is_active'=>$faker->boolean,
                 'activity_id'=>$faker->numberBetween(1,5),
             ]);
+            DB::table('activity_type_translations')->insert([[
+                'activity_type_id' => $s,
+                'local' => 'en',
+                'name' => $faker->sentence(5)
+            ],
+                [
+                    'activity_type_id' => $s,
+                    'local' => 'ar',
+                    'name' => $faker->sentence(5)
+                ]]);
         }
     }
 }

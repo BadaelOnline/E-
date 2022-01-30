@@ -17,10 +17,21 @@ class PlanSeeder extends Seeder
     {
         $faker=Faker::create();
         for ($i = 1; $i <= 5; $i++) {
-            DB::table('plans')->insert([
-                'name'=>$faker->word(),
-                'price_per_month'=>$faker->numberBetween(1000,8000),
+            $s = DB::table('plans')->insertGetId([
+                'is_active'=>$faker->boolean,
+                'activity_id'=>$faker->numberBetween(1,5),
+                'price_per_month'=>$faker->numberBetween(10000,50000),
             ]);
+            DB::table('plan_translations')->insert([[
+                'plan_id' => $s,
+                'local' => 'en',
+                'name' => $faker->sentence(5)
+            ],
+                [
+                    'plan_id' => $s,
+                    'local' => 'ar',
+                    'name' => $faker->sentence(5)
+                ]]);
         }
     }
 }

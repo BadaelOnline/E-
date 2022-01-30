@@ -12,8 +12,7 @@ class Attachment_Type extends Model
     protected $primaryKey = 'id';
     protected $table ='attachments_type';
     protected $fillable=[
-        'path','activity_id','record_num',
-        'attachments_type_id','created_at', 'updated_at'
+        'is_active'
     ];
     protected $hidden=['created_at', 'updated_at'];
     public function Attachment()

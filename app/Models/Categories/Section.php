@@ -20,6 +20,7 @@ class Section extends Model
     public $timestamps = true;
     protected $fillable = [
         'slug', 'image', 'is_active'];
+    protected $hidden = ['pivot'];
     public function getIsActiveAttribute($value)
     {
         return $value==1 ? 'Active' : 'Not Active';

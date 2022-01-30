@@ -35,11 +35,9 @@ class SectionService
     public function getAll()
     {
         try{
-            Gate::authorize('Read Section');
+//            Gate::authorize('Read Section');
 
-            $section = $this->SectionModel
-            ->with(['Category','Product'])
-            ->paginate($this->PAGINATION_COUNT);
+            $section = $this->SectionModel->get();
 
             if (count($section) > 0) {
                 return $this->returnData('Section', $section, 'done');
@@ -54,7 +52,7 @@ class SectionService
     public function getById($id )
     {
         try{
-            Gate::authorize('Read Section');
+//            Gate::authorize('Read Section');
             $section = $this->SectionModel
             ->with(['Category'=>function($q){
                 return $q->with(['Product'=>function($q){

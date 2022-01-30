@@ -15,6 +15,6 @@ class StoreScope implements Scope
     {
         $builder->join('store_translations', 'stores.id', '=','store_translations.store_id' )
             ->where('store_translations.local','=',Config::get('app.locale'))
-            ->select(['stores.id','stores.is_active','stores.created_at','store_translations.title']);
+            ->select(['stores.id','stores.is_active','stores.created_at','store_translations.name']);
     }
 }

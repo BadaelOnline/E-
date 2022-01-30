@@ -28,19 +28,14 @@ class CurrenciesService
     /****Get All Currencies  ****/
     public function getAll()
     {
-//        try {
-//            Gate::authorize('Read Brand');
+        try {
             $currencies = $this->currencyModel->get();
-            if (count($currencies) > 0) {
-                return $this->returnData('Currency', $currencies, 'done');
-            } else {
-                return $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet');
-            }
-
-
-//        } catch (\Exception $ex) {
-//            return $this->returnError('400', $ex->getMessage());
-//        }
+            return count($currencies) > 0 ?
+                 $this->returnData('Currency', $currencies, 'done'):
+                 $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet');
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
     }
     /*__________________________________________________________________*/
     /****Get Active Product By ID  ***
@@ -50,12 +45,10 @@ class CurrenciesService
     public function getById($id)
     {
         try {
-            Gate::authorize('Read Brand');
-            $brand = $this->BrandModel->with('Product')->findOrFail($id);
-            if (!isset($brand)) {
-                return $response = $this->returnSuccessMessage('This Brand not found', 'done');
-            }
-            return $response = $this->returnData('Brand', $brand, 'done');
+            $currencies = $this->currencyModel->findOrFail($id);
+            return is_null($currencies) > 0 ?
+                $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet'):
+                $this->returnData('Currency', $currencies, 'done');
         } catch (\Exception $ex) {
             if ($ex instanceof TokenExpiredException){
                 return $this->returnError('400', $ex->getMessage());
