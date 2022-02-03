@@ -159,6 +159,8 @@ Route::group(
                 Route::PUT('/banners/update/{bannerId}/{storeId}','StoreController@updateBanner');
                 Route::GET('/banners/get/{storeId}','StoreController@getBanner');
                 Route::GET('/users/get/{storeId}','StoreController@storeUsers');
+                Route::GET('/users/get/{storeId}','StoreController@storeUsers');
+                Route::GET('/users/delete/{storeId}/{userId}','StoreController@storeUsersDelete');
 
                 Route::POST('/insertProductToStore','StoresProductsController@insertProductToStore');
                 Route::PUT('/updateProductInStore/{id}','StoresProductsController@updateProductInStore');
@@ -513,6 +515,7 @@ Route::group(
          Route::GET('/activity','ActivityTypesController@ActivityGet');
          Route::GET('/get','ActivityTypesController@getAll');
          Route::GET('/get/{id}','ActivityTypesController@getById');
+         Route::GET('/get-by-activity/{activity_id}','ActivityTypesController@getByActivity');
          Route::POST('/create','ActivityTypesController@create');
          Route::PUT('/update/{id}','ActivityTypesController@update');
          Route::PUT('/trash/{id}','ActivityTypesController@trash');
@@ -557,6 +560,7 @@ Route::group(
      {
          Route::GET('/get','AttachmentsController@getAll');
          Route::GET('/get/{id}','AttachmentsController@getById');
+         Route::GET('/get-by-activity/{activity_id}','AttachmentsController@getByActivity');
          Route::POST('/create','AttachmentsController@create');
          Route::PUT('/update/{id}','AttachmentsController@update');
          Route::PUT('/trash/{id}','AttachmentsController@trash');

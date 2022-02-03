@@ -120,6 +120,9 @@ class AuthService
     public function register(Request $request)
     {
         $user=$this->userModel->create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'username' => $request->username,
             'age' => $request->age,
             'location_id' => $request->location_id,
             'social_media_id' => $request->social_media_id,
@@ -128,21 +131,7 @@ class AuthService
             'email' => $request->email,
             'password' =>bcrypt($request->password)
         ]);
-        $userid=$user->id;
-        if (isset($allusers) && count($allusers)) {
-            //insert other traslations for users
-            foreach ($allusers as $alluser) {
-                $transUser_arr[] = [
-                    'first_name' => $alluser ['first_name'],
-                    'last_name' => $alluser ['last_name'],
-                    'local' => $alluser['local'],
-                    'user_id' => $userid
-                ];
-            }
-            $this->userTranslation->insert($transUser_arr);
-        }
         $token = JWTAuth::fromUser($user);
-
         return $this->respondWithToken($token);
     }
     public function get_user(Request $request)
@@ -150,7 +139,7 @@ class AuthService
 
         $user = JWTAuth::authenticate($request->token);
 
-        return response()->json(['User' => $user]);
+        return response()->json(['User' => $this->user]);
     }
     /**
      * Get the token array structure.

@@ -47,11 +47,26 @@ class AttachmentService
     public function getById($id)
     {
         try {
-            $attachment = $this->attachmentModel->findOrFail($id);
-            if (!isset($brand)) {
-                return  $this->returnSuccessMessage('This attachment not found', 'done');
+            $attachment = $this->attachment->findOrFail($id);
+            if (!isset($attachment)) {
+                return $this->returnSuccessMessage('This attachment not found', 'done');
             }
             return $this->returnData('attachment', $attachment, 'done');
+        } catch (\Exception $ex) {
+            if ($ex instanceof TokenExpiredException) {
+                return $this->returnError('400', $ex->getMessage());
+            }
+            return $this->returnError('400', $ex->getMessage());
+
+        }
+    }
+        public function getByActivity($activity_id)
+        {
+        try {
+            $attachment = $this->attachment->where('activity_id',$activity_id)->get();
+         return !isset($attachment) ?
+             $this->returnSuccessMessage('This attachment not found', 'done'):
+             $this->returnData('attachment', $attachment, 'done');
         } catch (\Exception $ex) {
             if ($ex instanceof TokenExpiredException){
                 return $this->returnError('400', $ex->getMessage());
@@ -66,7 +81,7 @@ class AttachmentService
     public function getTrashed()
     {
         try {
-            $attachment = $this->attachmentModel->where('is_active', 0)->get();
+            $attachment = $this->attachment->where('is_active', 0)->get();
 
             if (count($attachment) > 0) {
                 return $this->returnData('attachment', $attachment, 'done');
@@ -133,7 +148,7 @@ class AttachmentService
             $folder = public_path('images/brands' . '/');
             DB::beginTransaction();
             // //create the default language's brand
-            $unTransattachment_id = $this->attachmentModel->insertGetId([
+            $unTransattachment_id = $this->attachment->insertGetId([
                 'slug' => $request['slug'],
                 'is_active' => $request['is_active'],
                 'image' => $this->upload( $request['image'],$folder),
@@ -146,13 +161,13 @@ class AttachmentService
                         'name' => $allattachment ['name'],
                         'local' => $allattachment['local'],
                         'description' => $allattachment['description'],
-                        'brand_id' => $unTransBrand_id
+                        'brand_id' => $unTransattachment_id
                     ];
                 }
                 $this->attachmentTranslation->insert($transBrand_arr);
             }
             DB::commit();
-            return $this->returnData('Brand', [$unTransBrand_id,$allbrands], 'done');
+            return $this->returnData('Brand', [$unTransattachment_id,$allattachments], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('Brand', $ex->getMessage());
@@ -167,14 +182,14 @@ class AttachmentService
     {
         $request->validated();
         try {
-            $attachment = $this->attachmentModel->find($id);
+            $attachment = $this->attachment->find($id);
             if (!$attachment)
                 return $this->returnError('400', 'not found this attachment');
             if (!($request->has('attachments.is_active')))
                 $request->request->add(['is_active' => 0]);
             else
                 $request->request->add(['is_active' => 1]);
-            $unTransattachment = $this->attachmentModel->where('attachments.id', $id)
+            $unTransattachment = $this->attachment->where('attachments.id', $id)
                 ->update([
                     'slug' => $request['slug'],
                     'is_active' => $request['is_active'],
@@ -183,16 +198,16 @@ class AttachmentService
             $request_attachments = array_values($request->attachment);
             foreach ($request_attachments as $request_attachment) {
                 $this->attachmentTranslation->where('attachment_id', $id)
-                    ->where('local', $request_brand['local'])
+                    ->where('local', $request_attachments['local'])
                     ->update([
-                        'name' => $request_brand ['name'],
-                        'local' => $request_brand['local'],
-                        'description' => $request_brand['description'],
+                        'name' => $request_attachments ['name'],
+                        'local' => $request_attachments['local'],
+                        'description' => $request_attachments['description'],
                         'brand_id' => $id
                     ]);
             }
             DB::commit();
-            return $this->returnData('Brand', [$id,$request_brands], 'done');
+            return $this->returnData('Brand', [$id,$request_attachments], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());

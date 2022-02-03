@@ -34,7 +34,7 @@ class AuthController extends Controller
         $this->authService=$authService;
         $this->roleModel=$roleModel;
         $this->userTranslation=$userTranslation;
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login','register']]);
 //        $this->middleware('guest');
 
     }

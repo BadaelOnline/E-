@@ -55,8 +55,23 @@ class ActivityTypesServicie
     public function getById($id)
     {
         try {
-//            Gate::authorize('Read Brand');
             $activity_Type = $this->activity_Type->findOrFail($id);
+            if (!isset($activity_Type)) {
+                return  $this->returnSuccessMessage('This activity_Type not found', 'done');
+            }
+            return  $this->returnData('activity_Type', $activity_Type, 'done');
+        } catch (\Exception $ex) {
+            if ($ex instanceof TokenExpiredException){
+                return $this->returnError('400', $ex->getMessage());
+            }
+            return $this->returnError('400', $ex->getMessage());
+
+        }
+    }
+    public function getByActivity($activity_id)
+    {
+        try {
+            $activity_Type = $this->activity_Type->where('activity_id' , $activity_id)->get();
             if (!isset($activity_Type)) {
                 return  $this->returnSuccessMessage('This activity_Type not found', 'done');
             }

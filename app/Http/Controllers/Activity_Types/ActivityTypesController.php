@@ -28,6 +28,10 @@ class ActivityTypesController extends Controller
     {
         return $this->activityTypesServicie->getById($id);
     }
+    public function getByActivity($activity_id)
+    {
+        return $this->activityTypesServicie->getByActivity($activity_id);
+    }
     public function getTrashed()
     {
         return $this->activityTypesServicie->getTrashed();

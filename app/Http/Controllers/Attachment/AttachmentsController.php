@@ -21,7 +21,6 @@ class AttachmentsController extends Controller
 //        $this->middleware('can:Delete Brand')->only(['trash','delete']);
 //        $this->middleware('can:Restore Brand')->only('restoreTrashed');
     }
-
     public function getAll()
     {
         return $this->attachmentsService->getAll();
@@ -29,6 +28,10 @@ class AttachmentsController extends Controller
     public function getById($id)
     {
         return $this->attachmentsService->getById($id);
+    }
+    public function getByActivity($activity_id)
+    {
+        return $this->attachmentsService->getByActivity($activity_id);
     }
     public function getTrashed()
     {
