@@ -441,7 +441,23 @@ class  StoreService
     }
     public function storeUsers($storeId)
     {
+        try {
         return $this->storeModel->with('User')->find($storeId);
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
+    }
+    public function storeUsersDelete($storeId,$userId)
+    {
+        try {
+            $store = $this->storemodel->find($storeId);
+            $store->User()->detach($userId);
+            $store_user= $store->with('User')->get();
+            return$this->returnData('store_user', $store_user, 'done');
+
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
     }
 
 }

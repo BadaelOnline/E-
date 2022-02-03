@@ -42,17 +42,28 @@ class PaymentMethodsServices
     }
     public function assigningToStore(Request $request,$storeId)
     {
+        try {
         if ($request->has('payments')) {
             $store = $this->storemodel->find($storeId);
             $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
-            return $store->with('Payment_Method')->get();
+             $store_payment=$store->with('Payment_Method')->get();
+            return$this->returnData('payments', $store_payment, 'done');
+        }
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
         }
     }
     public function deleteFromStore($paymentId,$storeId)
     {
+        try {
             $store = $this->storemodel->find($storeId);
             $store->Payment_Method()->detach($paymentId);
-            return $store->with('Payment_Method')->get();
+            $store_payment= $store->with('Payment_Method')->get();
+                return$this->returnData('payments', $store_payment, 'done');
+
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
     }
     public function getByStore($storeId)
     {

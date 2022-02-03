@@ -92,4 +92,8 @@ class StoreController extends Controller
     {
         return $this->StoreService->storeUsers($storeId);
     }
+    public function storeUsersDelete($storeId,$userId)
+    {
+        return $this->StoreService->storeUsersDelete($storeId,$userId);
+    }
 }
