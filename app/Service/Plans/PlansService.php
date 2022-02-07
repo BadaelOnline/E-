@@ -16,20 +16,25 @@ class PlansService
     private $plan;
     private $planTranslation;
     private $PAGINATION_COUNT;
+    private $features=[
+        'number_of_product'=>55,
+        'number_of_banner'=>55
+    ];
 
     use GeneralTrait;
 
-    public function __construct(Plan $plan,PlanTranslation $planTranslation)
+    public function __construct(Plan $plan, PlanTranslation $planTranslation)
     {
         $this->plan = $plan;
         $this->planTranslation = $planTranslation;
     }
+
     /****Get All  plans  ****/
     public function getAll()
     {
         try {
-//            return Config::get('activities.activity');
             $plans = $this->plan->get();
+//             $features=collect($plans)->all();
             if (count($plans) > 0) {
                 return $this->returnData('plan', $plans, 'done');
             } else {
@@ -52,11 +57,11 @@ class PlansService
 //            Gate::authorize('Read Brand');
             $plan = $this->plan->findOrFail($id);
             if (!isset($plan)) {
-                return  $this->returnSuccessMessage('This plan not found', 'done');
+                return $this->returnSuccessMessage('This plan not found', 'done');
             }
-            return  $this->returnData('plan', $plan, 'done');
+            return $this->returnData('plan',[ $plan,'features'=>$this->features] , 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
@@ -97,7 +102,7 @@ class PlansService
                 return $this->returnData('plan', $plan, 'This plan Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -137,8 +142,8 @@ class PlansService
             /** create the default language's ActivityType **/
             $unTransplanid = $this->plan->insertGetId([
                 'is_active' => $request['is_active'],
-                'activity_id'=> $request['activity_id'],
-                'price_per_month'=> $request['price_per_month']
+                'activity_id' => $request['activity_id'],
+                'price_per_month' => $request['price_per_month']
             ]);
             /** check the ActivityType and request */
             if (isset($allplans) && count($allplans)) {
@@ -153,7 +158,7 @@ class PlansService
                 $this->planTranslation->insert($transaplan_arr);
             }
             DB::commit();
-            return $this->returnData('plan', [$unTransplanid,$allplans], 'done');
+            return $this->returnData('plan', [$unTransplanid, $allplans], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('plan', $ex->getMessage());
@@ -179,8 +184,8 @@ class PlansService
             $unTransplan_id = $this->plan->where('plans.id', $id)
                 ->update([
                     'is_active' => $request['is_active'],
-                    'activity_id'=> $request['activity_id'],
-                    'price_per_month'=> $request['price_per_month']
+                    'activity_id' => $request['activity_id'],
+                    'price_per_month' => $request['price_per_month']
                 ]);
             $request_plans = array_values($request->plan);
             foreach ($request_plans as $request_plan) {
@@ -193,7 +198,7 @@ class PlansService
                     ]);
             }
             DB::commit();
-            return $this->returnData('plan', [$id,$request_plans], 'done');
+            return $this->returnData('plan', [$id, $request_plans], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
@@ -208,7 +213,7 @@ class PlansService
     {
         try {
             $plan = $this->plan->find($id);
-            $plan ->destroy($id);
+            $plan->destroy($id);
             return $this->returnData('plan', $plan, 'This plan Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());

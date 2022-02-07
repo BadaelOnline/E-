@@ -36,6 +36,7 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
     /**
      * Register the exception handling callbacks for the application.
      *
@@ -46,30 +47,32 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $exception) {
             //
         });
-//        $this->renderable(function(TokenInvalidException $e, $request){
-//            return Response::json(['error'=>'Invalid token'],401);
-//        });
-//        $this->renderable(function (TokenExpiredException $e, $request) {
-//            return Response::json(['error'=>'Token has Expired'],401);
-//        });
-//
-//        $this->renderable(function (JWTException $e, $request) {
-//            return Response::json(['error'=>'Token not parsed'],401);
-//        });
+        $this->renderable(function (TokenInvalidException $e, $request) {
+            return Response::json(['error' => 'Invalid token'], 401);
+        });
+        $this->renderable(function (TokenExpiredException $e, $request) {
+            return Response::json(['error' => 'Token has Expired'], 401);
+        });
+
+        $this->renderable(function (JWTException $e, $request) {
+            return Response::json(['error' => 'Token not parsed'], 401);
+        });
 //        $this->reportable(function (JWTException $exception) {
-//            return $this->returnError(403,'unauthorized,Please Login Or Register');
+//            return $this->returnError(403, 'unauthorized,Please Login Or Register');
 //        });
-//        $this->renderable(function (TokenExpiredException $ex){
-//                return $this->returnError(403,'unauthorized');
+//        $this->renderable(function (TokenExpiredException $ex) {
+//            return $this->returnError(403, 'unauthorized');
 //        });
-//        $this->renderable(function (JWTException $ex){
-//                 return $this->returnError(403,'unauthorized,Please Login Or Register');
-////        });
+//        $this->renderable(function (JWTException $ex) {
+//            return $this->returnError(403, 'unauthorized,Please Login Or Register');
+//        });
 //        $this->renderable(function (Throwable $e) {
 //            return $this->handleException($e);
 //        });
     }
-    public function handleException( Throwable $e){
+
+    public function handleException(Throwable $e)
+    {
         if ($e instanceof HttpException) {
             $code = $e->getStatusCode();
             $defaultMessage = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
@@ -90,17 +93,16 @@ class Handler extends ExceptionHandler
         } else if ($e instanceof RouteNotFoundException) {
             $errors = $e->getMessage();
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }else if ($e instanceof TokenInvalidException) {
+        } else if ($e instanceof TokenInvalidException) {
             $errors = $e->getMessage();
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }else if ($e instanceof TokenExpiredException) {
+        } else if ($e instanceof TokenExpiredException) {
             $errors = $e->getMessage();
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }else if ($e instanceof JWTException) {
+        } else if ($e instanceof JWTException) {
             $errors = $e->getMessage();
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-        else {
+        } else {
             if (config('app.debug'))
                 return $this->dataResponse($e->getMessage());
             else {

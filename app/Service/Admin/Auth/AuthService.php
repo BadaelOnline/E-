@@ -25,13 +25,15 @@ class AuthService
     private $userModel;
     private $roleModel;
     private $userTranslation;
-    public function __construct(User $userModel , Role $roleModel
+
+    public function __construct(User $userModel, Role $roleModel
         , UserTranslation $userTranslation)
     {
-        $this->userModel=$userModel;
-        $this->roleModel=$roleModel;
-        $this->userTranslation=$userTranslation;
+        $this->userModel = $userModel;
+        $this->roleModel = $roleModel;
+        $this->userTranslation = $userTranslation;
     }
+
     /**
      * Get a JWT via given credentials.
      *
@@ -39,46 +41,28 @@ class AuthService
      */
     public function login(Request $request)
     {
-        try{
+        try {
             $credentials = $request->only('email', 'password');
             $token = auth('user-api')->attempt($credentials);
-            if (! $token ) {
+            if (!$token) {
                 return $this->returnError('401', 'Unauthorized');
             }
-//            $user_id = Auth::guard('user-api')->user();
             $user_id = Auth::guard('user-api')->user()->getAuthIdentifier();
-            $user =$this->userModel->with('TypeUser')->find($user_id);
-////             $user = auth('api')->user();
-//
-//            $types=$user->TypeUser()->get();
-//            foreach ($types as $type){
-//                 $name[] = $type['name'];
-//
-//                switch ($type['name']){
-//                    case 'doctor':
-//                        return redirect()->route('doctor.dashboard')->with($token);
-//                        break;
-//                    case 'admin_store':
-//                        return [$token,redirect()->route('store_dashboard')];
-//                        break;
-//                    default:
-//                        return route('profile');
-//                }
-//            }
-//           $user->api_token = $token;
-            //return token
-            return $this->returnData('user', [$user,$token],'Done');
-//            return $this->respondWithToken($token);
-        }catch(\Throwable $ex){
-            if ($ex instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+            $user = $this->userModel->with('TypeUser')->find($user_id);
+            return $this->returnData('user', [$user, $token], 'Done');
+        } catch (\Throwable $ex) {
+            if ($ex instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
                 return $this->returnError('401', 'TokenInvalidException');
-            }else if ($ex instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+            } else if ($ex instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
                 return $this->returnError('401', 'TokenInvalidException');
-            } else if ( $ex instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
+            } else if ($ex instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
                 return $this->returnError('401', $ex->getMessage());
+            } else if ($ex instanceof \Illuminate\Database\QueryException) {
+                return $this->returnError('401', 'this email in used');
             }
         }
     }
+
     /**
      * Get the authenticated User.
      *
@@ -88,6 +72,7 @@ class AuthService
     {
         return response()->json(auth('user-api')->user());
     }
+
     /**
      * Log the user out (Invalidate the token).
      *
@@ -95,19 +80,20 @@ class AuthService
      */
     public function logout(Request $request)
     {
-        $token = $request -> token;
-        if($token){
+        $token = $request->token;
+        if ($token) {
             try {
 
                 auth('user-api')->setToken($token)->invalidate(); //logout
-            }catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e){
-                return  $this -> returnError('','some thing went wrongs'.$e->getMessage());
+            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+                return $this->returnError('', 'some thing went wrongs' . $e->getMessage());
             }
-            return $this->returnSuccessMessage('Logged out successfully','200');
-        }else{
-            $this -> returnError('','some thing went wrongs');
+            return $this->returnSuccessMessage('Logged out successfully', '200');
+        } else {
+            $this->returnError('', 'some thing went wrongs');
         }
     }
+
     /**
      * Refresh a token.
      *
@@ -117,9 +103,10 @@ class AuthService
     {
         return $this->respondWithToken(auth('user-api')->refresh());
     }
+
     public function register(Request $request)
     {
-        $user=$this->userModel->create([
+        $user = $this->userModel->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'username' => $request->username,
@@ -129,11 +116,12 @@ class AuthService
             'is_active' => $request->is_active,
             'image' => $request->image,
             'email' => $request->email,
-            'password' =>bcrypt($request->password)
+            'password' => bcrypt($request->password)
         ]);
         $token = JWTAuth::fromUser($user);
         return $this->respondWithToken($token);
     }
+
     public function get_user(Request $request)
     {
 
@@ -141,10 +129,11 @@ class AuthService
 
         return response()->json(['User' => $this->user]);
     }
+
     /**
      * Get the token array structure.
      *
-     * @param  string $token
+     * @param string $token
      *
      * @return JsonResponse
      */

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 class CreatePlansTable extends Migration
@@ -16,7 +17,10 @@ class CreatePlansTable extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->integer('activity_id');
-            $table->string('price_per_month');
+            $table->string('price');
+            $table->string('num_of_month');
+            $table->string('discount');
+            $table->json('features')->nullable();
             $table->boolean('is_active');
             $table->timestamps();
         });

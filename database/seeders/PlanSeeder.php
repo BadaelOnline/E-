@@ -15,12 +15,14 @@ class PlanSeeder extends Seeder
      */
     public function run()
     {
-        $faker=Faker::create();
+        $faker = Faker::create();
         for ($i = 1; $i <= 5; $i++) {
             $s = DB::table('plans')->insertGetId([
-                'is_active'=>$faker->boolean,
-                'activity_id'=>$faker->numberBetween(1,5),
-                'price_per_month'=>$faker->numberBetween(10000,50000),
+                'is_active' => $faker->boolean,
+                'activity_id' => $faker->numberBetween(1, 5),
+                'price' => $faker->numberBetween(10000, 50000),
+                'num_of_month' => $faker->numberBetween(1, 12),
+                'discount' => $faker->numberBetween(1, 100),
             ]);
             DB::table('plan_translations')->insert([[
                 'plan_id' => $s,
@@ -31,7 +33,8 @@ class PlanSeeder extends Seeder
                     'plan_id' => $s,
                     'local' => 'ar',
                     'name' => $faker->sentence(5)
-                ]]);
+                ]
+            ]);
         }
     }
 }

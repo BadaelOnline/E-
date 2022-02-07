@@ -18,10 +18,11 @@ class CreateSocialMediaTable extends Migration
             $table->string('phone_number')->nullable();
             $table->string('whatsapp_number')->nullable();
             $table->string('facebook_account')->nullable();
-            $table->string( 'instagram_account')->nullable();
+            $table->string('instagram_account')->nullable();
             $table->string('telegram_number')->nullable();
-            $table->string( 'email')->nullable();
-            $table->boolean('is_active')->nullable();
+            $table->string('email')->nullable();
+            $table->string('mobile')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

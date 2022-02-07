@@ -7,16 +7,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 trait GeneralTrait
 {
-    public function author($perm,$user){
-        $roles=$user->roles()->with('Permission')->get();
-        foreach ($roles as $role){
-             $permission = $role->permission->where('slug',$perm)->first();
+    public function author($perm, $user)
+    {
+        $roles = $user->roles()->with('Permission')->get();
+        foreach ($roles as $role) {
+            $permission = $role->permission->where('slug', $perm)->first();
         }
         if (isset($permission)) {
             return true;
         } else
             return false;
     }
+
     public function returnError($stateNum, $msg)
     {
         return response()->json([
@@ -26,39 +28,57 @@ trait GeneralTrait
         ])->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', '*');
     }
-    public function returnSuccessMessage($msg, $stateNum )
+
+    public function returnSuccessMessage($msg, $stateNum)
     {
         return response()->json(
             ['status' => true,
-            'stateNum' => $stateNum,
-            'msg' => $msg
-        ])->header('Access-Control-Allow-Origin', '*')
+                'stateNum' => $stateNum,
+                'msg' => $msg
+            ])->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', '*');
     }
-    public function returnData( $key,$value, $msg )
+
+    public function returnData($key, $value, $msg)
     {
         return response()->json(
             [
-                $key=>$value
-                ,'status' => true,
+                $key => $value
+                , 'status' => true,
                 'stateNum' => '201',
                 'msg' => $msg
             ]
         )->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', '*');
-        }
-    public function insert1($model1, $Arr1 )
+    }
+
+    public function returnPlanData($key, $value, $msg)
+    {
+        return response()->json(
+            [
+                $key => $value
+                , 'status' => true,
+                'stateNum' => '201',
+                'msg' => $msg
+            ]
+        )->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', '*');
+    }
+
+    public function insert1($model1, $Arr1)
     {
         $this->model1 = $model1;
         $int = $this->model1::insertGetId($Arr1);
         return $int;
     }
-    public function insert2($model2,$Arr2)
+
+    public function insert2($model2, $Arr2)
     {
-        $this->model2=$model2;
-        $trans=$this->model2::insert($Arr2 );
-        return $this->returnData('Store', $Arr2,'done');
+        $this->model2 = $model2;
+        $trans = $this->model2::insert($Arr2);
+        return $this->returnData('Store', $Arr2, 'done');
     }
+
     /**
      * Data Response
      * @param $data
@@ -68,6 +88,7 @@ trait GeneralTrait
     {
         return response()->json(['content' => $data], Response::HTTP_OK);
     }
+
     /**
      * Success Response
      * @param string $message
@@ -78,6 +99,7 @@ trait GeneralTrait
     {
         return response()->json(['success' => $message, 'code' => $code], $code);
     }
+
     /**
      * Error Response
      * @param $message
@@ -89,11 +111,12 @@ trait GeneralTrait
     {
         return response()->json(['error' => $message, 'code' => $code], $code);
     }
+
     public function uploadImage($folder, $image)
-{
-    $image->store('/', $folder);
-    $filename = $image->hashName();
-    $path = 'images/' . $folder . '/' . $filename;
-    return $path;
-}
+    {
+        $image->store('/', $folder);
+        $filename = $image->hashName();
+        $path = 'images/' . $folder . '/' . $filename;
+        return $path;
+    }
 }
