@@ -26,6 +26,7 @@ class ActivityTypesServicie
         $this->activity_typeTranslation = $activity_typeTranslation;
         $this->activity_Type = $activity_Type;
     }
+
     public function ActivityGet()
     {
         return Config::get('activities.activity');
@@ -57,27 +58,28 @@ class ActivityTypesServicie
         try {
             $activity_Type = $this->activity_Type->findOrFail($id);
             if (!isset($activity_Type)) {
-                return  $this->returnSuccessMessage('This activity_Type not found', 'done');
+                return $this->returnSuccessMessage('This activity_Type not found', 'done');
             }
-            return  $this->returnData('activity_Type', $activity_Type, 'done');
+            return $this->returnData('activity_Type', $activity_Type, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
 
         }
     }
+
     public function getByActivity($activity_id)
     {
         try {
-            $activity_Type = $this->activity_Type->where('activity_id' , $activity_id)->get();
+            $activity_Type = $this->activity_Type->where('activity_id', $activity_id)->get();
             if (!isset($activity_Type)) {
-                return  $this->returnSuccessMessage('This activity_Type not found', 'done');
+                return $this->returnSuccessMessage('This activity_Type not found', 'done');
             }
-            return  $this->returnData('activity_Type', $activity_Type, 'done');
+            return $this->returnData('activity_Type', $activity_Type, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
@@ -111,14 +113,14 @@ class ActivityTypesServicie
         try {
             $activity_Type = $this->activity_Type->find($id);
             if (is_null($activity_Type)) {
-                return $response = $this->returnSuccessMessage('activity_Type', 'This activity_Type not found');
+                return $this->returnSuccessMessage('activity_Type', 'This activity_Type not found');
             } else {
                 $activity_Type->is_active = true;
                 $activity_Type->save();
                 return $this->returnData('activity_Type', $activity_Type, 'This activity_Type Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -156,24 +158,24 @@ class ActivityTypesServicie
             $allActivityTypes = collect($request->activity_type)->all();
             DB::beginTransaction();
             /** create the default language's ActivityType **/
-             $unTransActivityType_id = $this->activity_Type->insertGetId([
+            $unTransActivityType_id = $this->activity_Type->insertGetId([
                 'is_active' => $request['is_active'],
-                'activity_id'=> $request['activity_id']
+                'activity_id' => $request['activity_id']
             ]);
             /** check the ActivityType and request */
             if (isset($allActivityTypes) && count($allActivityTypes)) {
                 /**  insert other translations for ActivityType */
                 foreach ($allActivityTypes as $allActivityType) {
-                     $transactivityType_arr[] = [
+                    $transactivityType_arr[] = [
                         'name' => $allActivityType ['name'],
                         'local' => $allActivityType['local'],
                         'activity_type_id' => $unTransActivityType_id,
                     ];
                 }
-                 $this->activity_typeTranslation->insert($transactivityType_arr);
+                $this->activity_typeTranslation->insert($transactivityType_arr);
             }
             DB::commit();
-            return $this->returnData('Activity_Type', [$unTransActivityType_id,$allActivityTypes], 'done');
+            return $this->returnData('Activity_Type', [$unTransActivityType_id, $allActivityTypes], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('Activity_Type', $ex->getMessage());
@@ -199,7 +201,7 @@ class ActivityTypesServicie
             $unTransActivityType_id = $this->activity_Type->where('activities_type.id', $id)
                 ->update([
                     'is_active' => $request['is_active'],
-                    'activity_id'=> $request['activity_id']
+                    'activity_id' => $request['activity_id']
                 ]);
             $request_activities = array_values($request->activity_type);
             foreach ($request_activities as $request_activitie) {
@@ -212,7 +214,7 @@ class ActivityTypesServicie
                     ]);
             }
             DB::commit();
-            return $this->returnData('activity_Type', [$id,$request_activities], 'done');
+            return $this->returnData('activity_Type', [$id, $request_activities], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
@@ -226,14 +228,9 @@ class ActivityTypesServicie
     public function delete($id)
     {
         try {
-//            Gate::authorize('Delete Brand');
-
             $activity_Type = $this->activity_Type->find($id);
-
-            $activity_Type ->destroy($id);
+            $activity_Type->destroy($id);
             return $this->returnData('activity_Type', $activity_Type, 'This activity_Type Is deleted Now');
-
-
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }

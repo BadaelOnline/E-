@@ -15,10 +15,11 @@ class BrandPolicy
 
     private $Brand;
     private $user;
-    public function __construct(Brand $Brand,User $user)
+
+    public function __construct(Brand $Brand, User $user)
     {
-        $this->Brand=$Brand;
-        $this->user=$user;
+        $this->Brand = $Brand;
+        $this->user = $user;
     }
 
     /**
@@ -29,7 +30,7 @@ class BrandPolicy
      */
     public function viewAny(User $user)
     {
-        return $this->author('Read Brand',$user);
+        return $this->author('Read Brand', $user);
     }
 
     /**
@@ -40,7 +41,7 @@ class BrandPolicy
      */
     public function view(User $user)
     {
-        return $this->author('Read Brand',$user);
+        return $this->author('Read Brand', $user);
     }
 
     /**
@@ -51,7 +52,7 @@ class BrandPolicy
      */
     public function create(User $user)
     {
-        return $this->author('Create Brand',$user);
+        return $this->author('Create Brand', $user);
     }
 
     /**
@@ -62,7 +63,7 @@ class BrandPolicy
      */
     public function update(User $user)
     {
-        return $this->author('Update Brand',$user);
+        return $this->author('Update Brand', $user);
     }
 
     /**
@@ -73,7 +74,7 @@ class BrandPolicy
      */
     public function delete(User $user)
     {
-        return $this->author('Delete Brand',$user);
+        return $this->author('Delete Brand', $user);
     }
 
     /**
@@ -84,7 +85,7 @@ class BrandPolicy
      */
     public function restore(User $user)
     {
-        return $this->author('Restore Brand',$user);
+        return $this->author('Restore Brand', $user);
     }
 
     /**
@@ -95,6 +96,6 @@ class BrandPolicy
      */
     public function forceDelete(User $user)
     {
-        return $this->author('Delete Brand',$user);
+        return $this->author('Delete Brand', $user);
     }
 }
