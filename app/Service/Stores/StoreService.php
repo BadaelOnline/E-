@@ -168,7 +168,7 @@ class  StoreService
     public function create(Request $request)
     {
         try {
-            return $request;
+//            return $request;
             //            $request->validated();
             /***  //transformation to collection*////
             $stores = collect($request->store)->all();
@@ -234,7 +234,7 @@ class  StoreService
                             'end_date' => $subscription['end_date'],
                             'plan_id' => $subscription['plan_id'],
                             'transaction_id' => $subscription['transaction_id'],
-                            'is_active' => $subscription['is_active'],
+                            'is_active' => 1,
                             'store_id' => $unTransStore_id
                         ];
                     }
@@ -249,21 +249,10 @@ class  StoreService
                             'whatsapp_number' => $social_media['whatsapp_number'],
                             'email' => $social_media['email'],
                             'mobile' => $social_media['mobile'],
-                            'is_active' => $social_media['is_active'],
+                            'is_active' =>1,
                         ];
                     }
                     $store_social = $this->social->insertGetId($social_medias_arr);
-                }
-            }
-            $images = $request->images;
-            if ($request->has('images')) {
-                foreach ($images as $image) {
-                    $storeImages = $this->storeModel->find($unTransStore_id);
-                    $storeImages->StoreImage()->insert([
-                        'store_id' => $unTransStore_id,
-                        'image' => $image['image'],
-                        'is_cover' => $image['is_cover']
-                    ]);
                 }
             }
             DB::commit();

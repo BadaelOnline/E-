@@ -6,7 +6,7 @@ namespace App\Service\PaymentMethod;
 
 use App\Http\Requests\Plan\PlanRequest;
 use App\Models\Payment\Payment_Method;
-use App\Models\stores\store;
+use App\Models\Stores\Store;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Finder\Exception\AccessDeniedException;

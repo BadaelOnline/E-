@@ -127,7 +127,7 @@ class AuthService
 
         $user = JWTAuth::authenticate($request->token);
 
-        return response()->json(['User' => $this->user]);
+        return response()->json(['User' => $user]);
     }
 
     /**

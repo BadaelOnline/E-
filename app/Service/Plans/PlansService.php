@@ -13,15 +13,11 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class PlansService
 {
+    use GeneralTrait;
+
     private $plan;
     private $planTranslation;
     private $PAGINATION_COUNT;
-    private $features=[
-        'number_of_product'=>55,
-        'number_of_banner'=>55
-    ];
-
-    use GeneralTrait;
 
     public function __construct(Plan $plan, PlanTranslation $planTranslation)
     {
@@ -59,7 +55,7 @@ class PlansService
             if (!isset($plan)) {
                 return $this->returnSuccessMessage('This plan not found', 'done');
             }
-            return $this->returnData('plan',[ $plan,'features'=>$this->features] , 'done');
+            return $this->returnData('plan', $plan, 'done');
         } catch (\Exception $ex) {
             if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
@@ -68,6 +64,24 @@ class PlansService
 
         }
     }
+
+    public function getByActivity($activity_id)
+    {
+        try {
+            $plans = $this->plan->where('activity_id', $activity_id)->get();
+            if (!isset($plans)) {
+                return $this->returnSuccessMessage('This plan not found', 'done');
+            }
+            return $this->returnData('plan', $plans, 'done');
+        } catch (\Exception $ex) {
+            if ($ex instanceof TokenExpiredException) {
+                return $this->returnError('400', $ex->getMessage());
+            }
+            return $this->returnError('400', $ex->getMessage());
+
+        }
+    }
+
     /*__________________________________________________________________*/
     /****ــــــ This Functions For Trashed plan  ****/
     /****Get All Trashed plan Or By ID  ****/
