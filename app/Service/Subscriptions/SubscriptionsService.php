@@ -22,16 +22,27 @@ class SubscriptionsService
     {
         $this->subscriptionModel = $subscriptionModel;
     }
+
+    private function fillSubscription($request_arr, $store_id)
+    {
+        return (
+        ['is_active' => true,
+            'store_id' => $store_id,
+            'plan_id' => $request_arr['plan_id'],
+            'start_date' => $request_arr['start_date'],
+            'end_date' => $request_arr['end_date'],
+            'transaction_id' => $request_arr['transaction_id'],
+        ]);
+    }
+
     /****Get All  subscriptions  ****/
     public function getAll()
     {
         try {
-            $subscription = $this->subscriptionModel->with(['Transaction','Plan','store'])->get();
-            if (count($subscription) > 0) {
-                return $this->returnData('subscription', $subscription, 'done');
-            } else {
-                return $this->returnSuccessMessage('subscription', 'subscription doesnt exist yet');
-            }
+            $subscription = $this->subscriptionModel->with(['Transaction', 'Plan', 'store'])->get();
+            return count($subscription) > 0 ?
+                $this->returnData('subscription', $subscription, 'done') :
+                $this->returnSuccessMessage('subscription', 'subscription doesnt exist yet');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
@@ -45,17 +56,12 @@ class SubscriptionsService
     {
         try {
 //            Gate::authorize('Read Brand');
-            $subscription = $this->subscription->findOrFail($id);
-            if (!isset($subscription)) {
-                return  $this->returnSuccessMessage('This subscription not found', 'done');
-            }
-            return  $this->returnData('subscription', $subscription, 'done');
+            $subscription = $this->subscriptionModel->findOrFail($id);
+            return !isset($subscription) ?
+                $this->returnSuccessMessage('This subscription not found', 'done') :
+                $this->returnData('subscription', $subscription, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
-                return $this->returnError('400', $ex->getMessage());
-            }
             return $this->returnError('400', $ex->getMessage());
-
         }
     }
     /*__________________________________________________________________*/
@@ -64,13 +70,11 @@ class SubscriptionsService
     public function getTrashed()
     {
         try {
-            $subscription = $this->subscription->where('is_active', 0)->get();
+            $subscription = $this->subscriptionModel->where('is_active', 0)->get();
 
-            if (count($subscription) > 0) {
-                return $this->returnData('subscription', $subscription, 'done');
-            } else {
-                return $this->returnSuccessMessage('subscription', 'subscription trashed doesnt exist yet');
-            }
+            return count($subscription) > 0 ?
+                $this->returnData('subscription', $subscription, 'done') :
+                $this->returnSuccessMessage('subscription', 'subscription trashed doesnt exist yet');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
@@ -83,16 +87,14 @@ class SubscriptionsService
     public function restoreTrashed($id)
     {
         try {
-            $subscription = $this->subscription->find($id);
-            if (is_null($subscription)) {
-                return $response = $this->returnSuccessMessage('subscription', 'This subscriptionsubscription not found');
-            } else {
+            $subscription = $this->subscriptionModel->find($id);
+            return is_null($subscription) ?
+                $this->returnSuccessMessage('subscription', 'This subscription not found') :
                 $subscription->is_active = true;
-                $subscription->save();
-                return $this->returnData('subscription', $subscription, 'This subscriptionsubscription Is trashed Now');
-            }
+            $subscription->save();
+            $this->returnData('subscription', $subscription, 'This subscription Is trashed Now');
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -104,7 +106,7 @@ class SubscriptionsService
     public function trash($id)
     {
         try {
-            $subscriptionsubscription = $this->subscriptionsubscription->find($id);
+            $subscriptionsubscription = $this->subscriptionModel->find($id);
             if (is_null($subscriptionsubscription)) {
                 return $response = $this->returnSuccessMessage('subscriptionsubscription', 'This subscriptionsubscription not found');
             } else {
@@ -121,24 +123,15 @@ class SubscriptionsService
     /****  Create plan   ***
      * @return JsonResponse
      */
-    public function create(SubscriptionRequest $request)
+    public function create($request, $store_id)
     {
         try {
-            $request->validated();
-            $request->is_active ? $is_active = true : $is_active = false;
-            /** transformation to collection */
             DB::beginTransaction();
-            /** create the default language's ActivityType **/
-            $subscription = $this->subscription->create([
-                'is_active' => $request['is_active'],
-                'store_id'=> $request['store_id'],
-                'plan_id'=> $request['plan_id'],
-                'start_date'=> $request['start_date'],
-                'end_date'=> $request['end_date'],
-                'transaction_id'=> $request['transaction_id'],
-            ]);
+            $subscription = $this->subscriptionModel->create(
+                $this->fillSubscription($request, $store_id)
+            );
             DB::commit();
-            return $this->returnData('subscription', $request, 'done');
+            return $this->returnData('subscription', $subscription, 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('subscription', $ex->getMessage());
@@ -164,14 +157,14 @@ class SubscriptionsService
             $subscription_update = $this->plan->where('subscriptions.id', $id)
                 ->update([
                     'is_active' => $request['is_active'],
-                    'store_id'=> $request['store_id'],
-                    'plan_id'=> $request['plan_id'],
-                    'start_date'=> $request['start_date'],
-                    'end_date'=> $request['end_date'],
-                    'transaction_id'=> $request['transaction_id'],
+                    'store_id' => $request['store_id'],
+                    'plan_id' => $request['plan_id'],
+                    'start_date' => $request['start_date'],
+                    'end_date' => $request['end_date'],
+                    'transaction_id' => $request['transaction_id'],
                 ]);
             DB::commit();
-            return $this->returnData('plan', [$id ,$request ], 'done');
+            return $this->returnData('plan', [$id, $request], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
@@ -186,7 +179,7 @@ class SubscriptionsService
     {
         try {
             $subscription = $this->subscription->find($id);
-            $subscription ->destroy($id);
+            $subscription->destroy($id);
             return $this->returnData('subscription', $subscription, 'This subscription Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());

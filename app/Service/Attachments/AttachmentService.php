@@ -25,19 +25,32 @@ class AttachmentService
         $this->attachment = $attachment;
         $this->PAGINATION_COUNT = 25;
     }
+
+    private function fillAttachment($request_arr, $record_num, $folder)
+    {
+        return (
+        [
+            'path' => $this->upload($request_arr['path'], $folder),
+            'activity_id' => $request_arr['activity_id'],
+            'attachments_type_id' => $request_arr['attachments_type_id'],
+            'record_num' => $record_num
+        ]);
+    }
+
+
     /****Get All attachment  ****/
     public function getAll()
     {
-       try {
-        $attachments = $this->attachment->all();
-        if (count($attachments) > 0) {
-            return $this->returnData('attachment', $attachments, 'done');
-        } else {
-            return $this->returnSuccessMessage('attachment', 'attachment doesnt exist yet');
+        try {
+            $attachments = $this->attachment->all();
+            if (count($attachments) > 0) {
+                return $this->returnData('attachment', $attachments, 'done');
+            } else {
+                return $this->returnSuccessMessage('attachment', 'attachment doesnt exist yet');
+            }
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
         }
-       } catch (\Exception $ex) {
-           return $this->returnError('400', $ex->getMessage());
-       }
     }
     /*__________________________________________________________________*/
     /****Get Active attachment By ID  ***
@@ -60,19 +73,19 @@ class AttachmentService
 
         }
     }
-        public function getByActivity($activity_id)
-        {
+
+    public function getByActivity($activity_id)
+    {
         try {
-            $attachment = $this->attachment->where('activity_id',$activity_id)->get();
-         return !isset($attachment) ?
-             $this->returnSuccessMessage('This attachment not found', 'done'):
-             $this->returnData('attachment', $attachment, 'done');
+            $attachment = $this->attachment->where('activity_id', $activity_id)->get();
+            return !isset($attachment) ?
+                $this->returnSuccessMessage('This attachment not found', 'done') :
+                $this->returnData('attachment', $attachment, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
-
         }
     }
     /*__________________________________________________________________*/
@@ -100,7 +113,7 @@ class AttachmentService
     public function restoreTrashed($id)
     {
         try {
-            $attachment = $this->attachmentModel->find($id);
+            $attachment = $this->attachment->find($id);
             if (is_null($attachment)) {
                 return $response = $this->returnSuccessMessage('attachment', 'This attachment not found');
             } else {
@@ -109,7 +122,7 @@ class AttachmentService
                 return $this->returnData('attachment', $attachment, 'This attachment Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -121,7 +134,7 @@ class AttachmentService
     public function trash($id)
     {
         try {
-            $attachment = $this->attachmentModel->find($id);
+            $attachment = $this->attachment->find($id);
             if (is_null($attachment)) {
                 return $this->returnSuccessMessage('attachment', 'This attachments not found');
             } else {
@@ -129,7 +142,6 @@ class AttachmentService
                 $attachment->save();
                 return $this->returnData('attachment', $attachment, 'This attachment Is trashed Now');
             }
-
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
@@ -138,39 +150,19 @@ class AttachmentService
     /****  Create attachment   ***
      * @return JsonResponse
      */
-    public function create(BrandRequest $request)
+    public function create($request, $record_num)
     {
         try {
-            // $validated = $request->validated();
-            $request->is_active ? $is_active = true : $is_active = false;
-            /** transformation to collection */
-            $allattachments = collect($request->attachment)->all();
-            $folder = public_path('images/brands' . '/');
             DB::beginTransaction();
-            // //create the default language's brand
-            $unTransattachment_id = $this->attachment->insertGetId([
-                'slug' => $request['slug'],
-                'is_active' => $request['is_active'],
-                'image' => $this->upload( $request['image'],$folder),
-            ]);
-            //check the Brand and request
-            if (isset($allattachments) && count($allattachments)) {
-                //insert other traslations for attachment
-                foreach ($allattachments as $allattachment) {
-                    $transBrand_arr[] = [
-                        'name' => $allattachment ['name'],
-                        'local' => $allattachment['local'],
-                        'description' => $allattachment['description'],
-                        'brand_id' => $unTransattachment_id
-                    ];
-                }
-                $this->attachmentTranslation->insert($transBrand_arr);
-            }
+            $folder = public_path('images/attachments/stores' . '/' . $record_num . '/');
+            $attachment = $this->attachment->create(
+                $this->fillAttachment($request, $record_num, $folder)
+            );
             DB::commit();
-            return $this->returnData('Brand', [$unTransattachment_id,$allattachments], 'done');
+            return $this->returnData('attachment', $attachment, 'done');
         } catch (\Exception $ex) {
             DB::rollback();
-            return $this->returnError('Brand', $ex->getMessage());
+            return $this->returnError('attachment', $ex->getMessage());
         }
     }
     /*__________________________________________________________________*/
@@ -178,7 +170,7 @@ class AttachmentService
      * @param $id
      * @return JsonResponse
      */
-    public function update(BrandRequest $request, $id)
+    public function update($request, $id)
     {
         $request->validated();
         try {
@@ -207,12 +199,13 @@ class AttachmentService
                     ]);
             }
             DB::commit();
-            return $this->returnData('Brand', [$id,$request_attachments], 'done');
+            return $this->returnData('Brand', [$id, $request_attachments], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
         }
     }
+
     /*__________________________________________________________________*/
     public function search($title)
     {
@@ -236,39 +229,42 @@ class AttachmentService
     {
         try {
             $attachment = $this->attachmentModel->find($id);
-            $attachment ->destroy($id);
+            $attachment->destroy($id);
             return $this->returnData('attachment', $attachment, 'This attachment Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
-    public function upload($image,$folder)
+
+    public function upload($image, $folder)
     {
         $folder = public_path('images/brands' . '/');
         $filename = time() . '.' . $image->getClientOriginalName();
-        $imageUrl[]='images/brands/' .  $filename;
+        $imageUrl[] = 'images/brands/' . $filename;
         if (!File::exists($folder)) {
             File::makeDirectory($folder, 0775, true, true);
         }
-        $image->move($folder,$filename);
+        $image->move($folder, $filename);
         return $filename;
     }
+
     public function update_upload(Request $request, $id)
     {
-        $brand= $this->attachmentModel->find($id);
+        $brand = $this->attachmentModel->find($id);
         if (!isset($brand)) {
             return $this->returnSuccessMessage('This Brand not found', 'done');
         }
-        $old_image=$brand->image;
+        $old_image = $brand->image;
         $image = $request->file('image');
-        $old_images=public_path('images/brands' . '/' .$old_image);
-        if(File::exists($old_images)){
+        $old_images = public_path('images/brands' . '/' . $old_image);
+        if (File::exists($old_images)) {
             unlink($old_images);
         }
         $folder = public_path('images/brands' . '/');
         $filename = time() . '.' . $image->getClientOriginalName();
-        $brand->update(['image' => $filename]);/**update in database**/
-        $image->move($folder,$filename);
+        $brand->update(['image' => $filename]);
+        /**update in database**/
+        $image->move($folder, $filename);
         return $filename;
     }
 }

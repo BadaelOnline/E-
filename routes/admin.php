@@ -119,7 +119,7 @@ Route::group(
         });
         /**_______________________ Store dashboard routes  ___________________**/
         Route::group(['prefix' => 'dashstores', 'namespace' => 'Store'], function () {
-            Route::PUT('/aprrove/{id}', 'storeController@aprrove');
+            Route::PUT('/approve/{id}', 'storeController@approve');
             Route::GET('/getAll', 'storeController@dashgetAll');
         });
         /**_______________________ Category dashboard routes  ___________________**/

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Subscription;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Subscription\SubscriptionRequest;
 use App\Service\Subscriptions\SubscriptionsService;
+use Illuminate\Http\Request;
 use App\Traits\GeneralTrait;
 
 class SubscriptionsController extends Controller
@@ -27,9 +28,9 @@ class SubscriptionsController extends Controller
     {
         return $this->subscriptionsService->getTrashed();
     }
-    public function create(SubscriptionRequest $request)
+    public function create(Request $request,$store_id)
     {
-        return $this->subscriptionsService->create($request);
+        return $this->subscriptionsService->create($request,$store_id);
     }
     public function update(SubscriptionRequest $request,$id)
     {

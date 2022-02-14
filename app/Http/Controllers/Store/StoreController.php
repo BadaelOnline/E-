@@ -21,9 +21,9 @@ class StoreController extends Controller
     }
     /****________________   admins dashboard functions ________________****/
     /****________________   Store's approved ________________****/
-    public function aprrove($id)
+    public function approve($id)
     {
-        return $this->StoreService->aprrove($id);
+        return $this->StoreService->approve($id);
     }
 
     /****________________   Store's list ________________****/
