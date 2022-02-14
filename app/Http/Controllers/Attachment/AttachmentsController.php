@@ -37,9 +37,9 @@ class AttachmentsController extends Controller
     {
         return $this->attachmentsService->getTrashed();
     }
-    public function create(Request $request)
+    public function create(Request $request , $record_num)
     {
-        return $this->attachmentsService->create($request);
+        return $this->attachmentsService->create($request,$record_num);
     }
     public function update(Request $request,$id)
     {

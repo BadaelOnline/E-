@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Http\Request;
 
 trait GeneralTrait
 {
@@ -77,6 +78,11 @@ trait GeneralTrait
         $this->model2 = $model2;
         $trans = $this->model2::insert($Arr2);
         return $this->returnData('Store', $Arr2, 'done');
+    }
+
+    public function FillArray(Request $request ,$arr )
+    {
+
     }
 
     /**

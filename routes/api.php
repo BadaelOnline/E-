@@ -525,7 +525,7 @@ Route::group(
             Route::GET('/get', 'AttachmentsController@getAll');
             Route::GET('/get/{id}', 'AttachmentsController@getById');
             Route::GET('/get-by-activity/{activity_id}', 'AttachmentsController@getByActivity');
-            Route::POST('/create', 'AttachmentsController@create');
+            Route::POST('/create/{record_num}', 'AttachmentsController@create');
             Route::PUT('/update/{id}', 'AttachmentsController@update');
             Route::PUT('/trash/{id}', 'AttachmentsController@trash');
             Route::PUT('/restore/{id}', 'AttachmentsController@restoreTrashed');

@@ -2,16 +2,15 @@
 
 namespace App\Service\Stores;
 
-use App\Http\Requests\Store\StoreRequest;
 use App\Models\Images\Banner;
 use App\Models\Stores\Store;
-use App\Models\SocialMedia\SocialMedia;
 use App\Models\Stores\StoreTranslation;
 use App\Scopes\BrandScope;
+use App\Service\Attachments\AttachmentService;
+use App\Service\SocialMedia\SocialMediaService;
+use App\Service\Subscriptions\SubscriptionsService;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
-use App\Models\Attachments\Attachment;
-use App\Models\Plans\Subscription;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -22,25 +21,42 @@ class  StoreService
     use GeneralTrait;
     private $storeTranslation;
     private $Store;
-    private $attachment;
-    private $subscription;
+    private $attachmentsService;
     private $banner;
-    private $social;
+    private $SocialMediaService;
+    private $subscriptionService;
 
-    public function __construct(Store $store, StoreTranslation $storeTranslation, Banner $banner,
-                                Attachment $attachment, Subscription $subscription, SocialMedia $social)
+    public function __construct(Store $store, StoreTranslation $storeTranslation,
+                                Banner $banner, AttachmentService $attachmentsService,
+                                SubscriptionsService $subscriptionService,
+                                SocialMediaService $SocialMediaService)
     {
         $this->storeModel = $store;
         $this->storeTranslation = $storeTranslation;
-        $this->attachment = $attachment;
-        $this->subscription = $subscription;
+        $this->attachmentService = $attachmentsService;
         $this->banner = $banner;
-        $this->social = $social;
-        $this->PAGINATION_COUNT = 25;
+        $this->SocialMediaService = $SocialMediaService;
+        $this->subscriptionService = $subscriptionService;
     }
+
+    private function fillStore($request_arr, $store_social, $logo_folder)
+    {
+        return (
+        ['currency_id' => $request_arr['currency_id'],
+            'location_id' => $request_arr['location_id'],
+            'social_media_id' => $store_social,
+            'activity_type_id' => $request_arr['activity_type_id'],
+            'owner_id' => $request_arr['owner_id'],
+            'section_id' => $request_arr['section_id'],
+            'is_approved' => 0,
+            'is_active' => 1,
+            'logo' => $this->upload($request_arr['logo'], $logo_folder),
+        ]);
+    }
+
     /****________________   admins dashboard ________________****/
     /****________________   Store's approved ________________****/
-    public function aprrove($id)
+    public function approve($id)
     {
         try {
             $store = $this->storeModel->find($id);
@@ -165,98 +181,49 @@ class  StoreService
     }
 
     /****________________  Create Store   ________________****/
-    public function create(Request $request)
+    public function create($request)
     {
         try {
-//            return $request;
-            //            $request->validated();
+            $request;
             /***  //transformation to collection*////
             $stores = collect($request->store)->all();
-            $attachments = collect($request->attachments)->all();
+            $attachments = collect($request->attachments);
             $subscriptions = collect($request->subscriptions)->all();
-//            $social_media = collect($request->social_media)->all();
             $logo_folder = public_path('images/stores/logo/');
             DB::beginTransaction();
-            $store_social = $this->social->insertGetId([
-                'phone_number' => $request->social_media['phone_number'],
-                'whatsapp_number' => $request->social_media['whatsapp_number'],
-                'email' => $request->social_media['email'],
-//                'is_active' => $request->social_media['is_active'],
-                'mobile' => $request->social_media['mobile'],
-            ]);
-            /**** // //create the default language's product****/
-            $unTransStore_id = $this->storeModel->insertGetId([
-                'currency_id' => $request['currency_id'],
-                'location_id' => $request['location_id'],
-                'social_media_id' => $request['social_media_id'],
-                'activity_type_id' => $store_social,
-                'owner_id' => $request['owner_id'],
-                'section_id' => $request['section_id'],
-//                'is_active' => $request['is_active'],
-                'is_approved' => 0,
-                'logo' => $this->upload($request['logo'], $logo_folder)
-            ]);
-            //check the category and request
+            $store_social = $this->SocialMediaService->create($request->social_media);
+            /****create the default language's store****/
+            $unTransStore_id = $this->storeModel->insertGetId(
+                $this->fillStore($request, $store_social, $logo_folder)
+            );
             if (isset($stores) && count($stores)) {
-                //insert other traslations for products
+                /**insert other traslations for products**/
                 foreach ($stores as $store) {
-                    $transstore_arr[] = [
+                    $transStore_arr[] = [
                         'local' => $store['local'],
                         'name' => $store['name'],
                         'store_id' => $unTransStore_id
                     ];
                 }
-                $this->storeTranslation->insert($transstore_arr);
+                $this->storeTranslation->insert($transStore_arr);
             }
             if ($request->has('section')) {
                 $store = $this->storeModel->find($unTransStore_id);
                 $store->Section()->syncWithoutDetaching($request->get('section'));
             }
-            if ($request->has('attachments')) {
-                if (isset($attachments) && count($attachments)) {
-                    $folder = public_path('images/attachments/stores' . '/' . $unTransStore_id . '/');
-                    foreach ($attachments as $attachment) {
-                        $attachments_arr[] = [
-                            'path' => $this->upload($attachment['path'], $folder),
-                            'activity_id' => $attachment['activity_id'],
-                            'attachments_type_id' => $attachment['attachments_type_id'],
-                            'record_num' => $unTransStore_id
-                        ];
-                    }
-                    $this->attachment->insert($attachments_arr);
+//
+            if (isset($subscriptions) && count($subscriptions) > 0) {
+                foreach ($subscriptions as $subscription) {
+                    $this->subscriptionService->create($subscription, $unTransStore_id);
                 }
             }
-            if ($request->has('subscriptions')) {
-                if (isset($subscriptions) && count($subscriptions)) {
-                    foreach ($subscriptions as $subscription) {
-                        $subscriptions_arr[] = [
-                            'start_date' => $subscription['start_date'],
-                            'end_date' => $subscription['end_date'],
-                            'plan_id' => $subscription['plan_id'],
-                            'transaction_id' => $subscription['transaction_id'],
-                            'is_active' => 1,
-                            'store_id' => $unTransStore_id
-                        ];
-                    }
-                    $this->subscription->insert($subscriptions_arr);
-                }
-            }
-            if ($request->has('SocialMedia')) {
-                if (isset($social_medias) && count($social_medias)) {
-                    foreach ($social_medias as $social_media) {
-                        $social_medias_arr[] = [
-                            'phone_number' => $social_media['phone_number'],
-                            'whatsapp_number' => $social_media['whatsapp_number'],
-                            'email' => $social_media['email'],
-                            'mobile' => $social_media['mobile'],
-                            'is_active' =>1,
-                        ];
-                    }
-                    $store_social = $this->social->insertGetId($social_medias_arr);
+            if (isset($attachments) && count($attachments) > 0) {
+                foreach ($attachments as $attachment) {
+                    $this->attachmentService->create($attachment, $unTransStore_id);
                 }
             }
             DB::commit();
-            return $this->returnData('Store', [$unTransStore_id, $transstore_arr], 'done');
+            return $this->returnData('Store', [$unTransStore_id, $transStore_arr], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('store', $ex->getMessage());

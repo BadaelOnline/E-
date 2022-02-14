@@ -5,6 +5,8 @@ namespace App\Http\Controllers\SocialMedia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SocialMedia\SocialMediaRequest;
 use App\Service\SocialMedia\SocialMediaService;
+use Illuminate\Http\Request;
+
 
 class SocialMediaController extends Controller
 {
@@ -26,7 +28,7 @@ class SocialMediaController extends Controller
     {
         return $this->SocialMediaService->getTrashed();
     }
-    public function create(SocialMediaRequest $request)
+    public function create(Request $request)
     {
         return $this->SocialMediaService->create($request);
     }
