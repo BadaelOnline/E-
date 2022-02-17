@@ -2,7 +2,6 @@
 
 namespace App\Service\Attachments;
 
-use App\Http\Requests\Brands\BrandRequest;
 use App\Models\Attachments\Attachment;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
@@ -26,12 +25,12 @@ class AttachmentService
         $this->PAGINATION_COUNT = 25;
     }
 
-    private function fillAttachment($request_arr, $record_num, $folder)
+    private function fillAttachment($request_arr, $record_num, $folder, $activity_id)
     {
         return (
         [
             'path' => $this->upload($request_arr['path'], $folder),
-            'activity_id' => $request_arr['activity_id'],
+            'activity_id' => $activity_id,
             'attachments_type_id' => $request_arr['attachments_type_id'],
             'record_num' => $record_num
         ]);
@@ -150,13 +149,13 @@ class AttachmentService
     /****  Create attachment   ***
      * @return JsonResponse
      */
-    public function create($request, $record_num)
+    public function create($request, $record_num, $activity_id)
     {
         try {
             DB::beginTransaction();
             $folder = public_path('images/attachments/stores' . '/' . $record_num . '/');
             $attachment = $this->attachment->create(
-                $this->fillAttachment($request, $record_num, $folder)
+                $this->fillAttachment($request, $record_num, $folder, $activity_id)
             );
             DB::commit();
             return $this->returnData('attachment', $attachment, 'done');
