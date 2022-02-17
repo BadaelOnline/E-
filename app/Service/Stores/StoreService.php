@@ -184,7 +184,7 @@ class  StoreService
     public function create($request)
     {
         try {
-            $request;
+//            return $request;
             /***  //transformation to collection*////
             $stores = collect($request->store)->all();
             $attachments = collect($request->attachments);
@@ -211,15 +211,10 @@ class  StoreService
                 $store = $this->storeModel->find($unTransStore_id);
                 $store->Section()->syncWithoutDetaching($request->get('section'));
             }
-//
-            if (isset($subscriptions) && count($subscriptions) > 0) {
-                foreach ($subscriptions as $subscription) {
-                    $this->subscriptionService->create($subscription, $unTransStore_id);
-                }
-            }
+            $this->subscriptionService->create($unTransStore_id, $request->plan_id);
             if (isset($attachments) && count($attachments) > 0) {
                 foreach ($attachments as $attachment) {
-                    $this->attachmentService->create($attachment, $unTransStore_id);
+                    $this->attachmentService->create($attachment, $unTransStore_id, 1);
                 }
             }
             DB::commit();

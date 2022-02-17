@@ -504,7 +504,7 @@ Route::group(
         Route::group(['prefix' => 'subscriptions', 'namespace' => 'Subscription'], function () {
             Route::GET('/get', 'SubscriptionsController@getAll');
             Route::GET('/get/{id}', 'SubscriptionsController@getById');
-            Route::POST('/create', 'SubscriptionsController@create');
+            Route::POST('/create/{store_id}/{plan_id}', 'SubscriptionsController@create');
             Route::PUT('/update/{id}', 'SubscriptionsController@update');
             Route::PUT('/trash/{id}', 'SubscriptionsController@trash');
             Route::PUT('/restore/{id}', 'SubscriptionsController@restoreTrashed');

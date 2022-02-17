@@ -4,6 +4,7 @@ namespace App\Service\Subscriptions;
 
 use App\Http\Requests\Plan\PlanRequest;
 use App\Http\Requests\Subscription\SubscriptionRequest;
+use App\Models\Plans\Plan;
 use App\Models\Plans\Subscription;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
@@ -14,24 +15,29 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 class SubscriptionsService
 {
     private $subscriptionModel;
+    private $planModel;
     private $PAGINATION_COUNT;
 
     use GeneralTrait;
 
-    public function __construct(Subscription $subscriptionModel)
+    public function __construct(Subscription $subscriptionModel,Plan $planModel)
     {
         $this->subscriptionModel = $subscriptionModel;
+        $this->planModel = $planModel;
     }
 
-    private function fillSubscription($request_arr, $store_id)
+    private function fillSubscription( $store_id,$plan_id)
     {
+        $plan=$this->planModel->find($plan_id);
+        $period=($plan->num_of_month)*30;
+
         return (
         ['is_active' => true,
             'store_id' => $store_id,
-            'plan_id' => $request_arr['plan_id'],
-            'start_date' => $request_arr['start_date'],
-            'end_date' => $request_arr['end_date'],
-            'transaction_id' => $request_arr['transaction_id'],
+            'plan_id' => $plan_id,
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addDays($period)->toDateString(),
+            'transaction_id' =>1,
         ]);
     }
 
@@ -123,12 +129,12 @@ class SubscriptionsService
     /****  Create plan   ***
      * @return JsonResponse
      */
-    public function create($request, $store_id)
+    public function create($store_id,$plan_id)
     {
         try {
             DB::beginTransaction();
             $subscription = $this->subscriptionModel->create(
-                $this->fillSubscription($request, $store_id)
+                $this->fillSubscription($store_id,$plan_id)
             );
             DB::commit();
             return $this->returnData('subscription', $subscription, 'done');
