@@ -198,11 +198,11 @@ class  StoreService
              $admin=User::where('email','superadministrator@app.com')->findOrFail(1);
 //             $alaa='fahed9285@gmail.com';
 //            Notification::send($alaa, new SendRequest($request,$alaa));
-            Mail::send('email.sendmail',compact('front'),
-                function ($message){
-                    $message->to('fahed8592@gmail.com','laravel')
-                    ->subject('store register request');
-                });
+//            Mail::send('email.sendmail',compact('front'),
+//                function ($message){
+//                    $message->to('fahed8592@gmail.com','laravel')
+//                    ->subject('store register request');
+//                });
             $stores = collect($request->store)->all();
             $attachments = collect($request->attachments);
             $subscriptions = collect($request->subscriptions)->all();
