@@ -23,54 +23,62 @@ class PaymentMethodsServices
 
     use GeneralTrait;
 
-    public function __construct(Payment_Method $payments,Store $storemodel)
+    public function __construct(Payment_Method $payments, Store $storemodel)
     {
         $this->payments = $payments;
         $this->storemodel = $storemodel;
     }
+
     /****Get All  plans  ****/
     public function getAll()
     {
         try {
             $paymentss = $this->payments->get();
             return count($paymentss) > 0 ?
-                 $this->returnData('payments', $paymentss, 'done'):
-                 $this->returnSuccessMessage('payments', 'payments doesnt exist yet');
+                $this->returnData('payments', $paymentss, 'done') :
+                $this->returnSuccessMessage('payments', 'payments doesnt exist yet');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
-    public function assigningToStore(Request $request,$storeId)
+
+    public function assigningToStore(Request $request, $storeId)
     {
         try {
-        if ($request->has('payments')) {
-            $store = $this->storemodel->find($storeId);
-            $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
-             $store_payment=$store->with('Payment_Method')->get();
-            return$this->returnData('payments', $store_payment, 'done');
-        }
+            if ($request->has('payments')) {
+                $store = $this->storemodel->find($storeId);
+                if(is_null($store) )
+                {
+                    $this->returnSuccessMessage('Store', 'stores doesnt exist yet');
+                }else
+                $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
+                $store_payment = $store->with('Payment_Method')->get();
+                return $this->returnData('payments', $store_payment, 'done');
+            }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
-    public function deleteFromStore($paymentId,$storeId)
+
+    public function deleteFromStore($paymentId, $storeId)
     {
         try {
             $store = $this->storemodel->find($storeId);
             $store->Payment_Method()->detach($paymentId);
-            $store_payment= $store->with('Payment_Method')->get();
-                return$this->returnData('payments', $store_payment, 'done');
+            $store_payment = $store->with('Payment_Method')->get();
+            return $this->returnData('payments', $store_payment, 'done');
 
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
+
     public function getByStore($storeId)
     {
-             $store = $this->storemodel->with('Payment_Method')->find($storeId);
-        return is_null($store)  ?
-            $this->returnSuccessMessage('store payments method', 'store doesnt exist yet'):
-             $this->returnData('store payments method', $store, 'done');
+        $store = $this->storemodel->with('Payment_Method')->find($storeId);
+        return is_null($store) ?
+            $this->returnSuccessMessage('store payments method', 'store doesnt exist yet') :
+            $this->returnData('store payments method', $store, 'done');
     }
     /*__________________________________________________________________*/
     /****Get Active plan By ID  ***
@@ -83,11 +91,11 @@ class PaymentMethodsServices
 //            Gate::authorize('Read Brand');
             $plan = $this->plan->findOrFail($id);
             if (!isset($plan)) {
-                return  $this->returnSuccessMessage('This plan not found', 'done');
+                return $this->returnSuccessMessage('This plan not found', 'done');
             }
-            return  $this->returnData('plan', $plan, 'done');
+            return $this->returnData('plan', $plan, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
@@ -128,7 +136,7 @@ class PaymentMethodsServices
                 return $this->returnData('plan', $plan, 'This plan Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -168,8 +176,8 @@ class PaymentMethodsServices
             /** create the default language's ActivityType **/
             $unTransplanid = $this->plan->insertGetId([
                 'is_active' => $request['is_active'],
-                'activity_id'=> $request['activity_id'],
-                'price_per_month'=> $request['price_per_month']
+                'activity_id' => $request['activity_id'],
+                'price_per_month' => $request['price_per_month']
             ]);
             /** check the ActivityType and request */
             if (isset($allplans) && count($allplans)) {
@@ -184,7 +192,7 @@ class PaymentMethodsServices
                 $this->planTranslation->insert($transaplan_arr);
             }
             DB::commit();
-            return $this->returnData('plan', [$unTransplanid,$allplans], 'done');
+            return $this->returnData('plan', [$unTransplanid, $allplans], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('plan', $ex->getMessage());
@@ -210,8 +218,8 @@ class PaymentMethodsServices
             $unTransplan_id = $this->plan->where('plans.id', $id)
                 ->update([
                     'is_active' => $request['is_active'],
-                    'activity_id'=> $request['activity_id'],
-                    'price_per_month'=> $request['price_per_month']
+                    'activity_id' => $request['activity_id'],
+                    'price_per_month' => $request['price_per_month']
                 ]);
             $request_plans = array_values($request->plan);
             foreach ($request_plans as $request_plan) {
@@ -224,7 +232,7 @@ class PaymentMethodsServices
                     ]);
             }
             DB::commit();
-            return $this->returnData('plan', [$id,$request_plans], 'done');
+            return $this->returnData('plan', [$id, $request_plans], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
@@ -239,7 +247,7 @@ class PaymentMethodsServices
     {
         try {
             $plan = $this->plan->find($id);
-            $plan ->destroy($id);
+            $plan->destroy($id);
             return $this->returnData('plan', $plan, 'This plan Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());

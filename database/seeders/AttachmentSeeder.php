@@ -19,7 +19,6 @@ class AttachmentSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             DB::table('attachments')->insert([
                 'path' => $faker->word(),
-                'activity_id' => $faker->numberBetween(1, 5),
                 'attachments_type_id' => $faker->numberBetween(1, 5),
                 'record_num' => $faker->numberBetween(1000, 5000),
             ]);

@@ -34,6 +34,6 @@ class Attachment extends Model
     }
     public function Attachment_Type()
     {
-        return $this->hasMany(Attachment_Type::class,'attachments_type_id');
+        return $this->belongsTo(Attachment_Type::class,'attachments_type_id');
     }
 }

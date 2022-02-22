@@ -16,6 +16,7 @@ use App\Models\Shipping\Shipping_Method;
 use App\Models\SocialMedia\SocialMedia;
 use App\Models\Stores_Orders\Stores_Order;
 use App\Models\User;
+use App\Models\Images\Banner;
 use App\Scopes\StoreScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +37,7 @@ class Store extends Model
         'currency_id', 'location_id', 'social_media_id',
         'activity_type_id', 'owner_id', 'street_id',
         'is_active', 'logo', 'is_approved'
-        , 'is_active', 'section_id'
+        , 'is_active', 'section_id','created_at', 'updated_at',
     ];
 
     public function getIsActiveAttribute($value)
@@ -167,5 +168,10 @@ class Store extends Model
     public function Location()
     {
         return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    public function Banner()
+    {
+        return $this->HasMany(Banner::class);
     }
 }

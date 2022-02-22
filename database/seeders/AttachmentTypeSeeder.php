@@ -19,6 +19,7 @@ class AttachmentTypeSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             $s = DB::table('attachments_type')->insertGetId([
                 'is_active'=>$faker->boolean,
+                'activity_id'=>$faker->numberBetween(1,4),
             ]);
             DB::table('attachments_type_translation')->insert([[
                 'attachment_type_id' => $s,

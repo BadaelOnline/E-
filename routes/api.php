@@ -59,7 +59,7 @@ Route::group(
             Route::Post('/getcheckout', 'StoresOrderController@getChekOutId');
         });
         Route::group(['prefix' => 'payments', 'namespace' => 'PaymentMethod'], function () {
-            Route::get('/get', 'PaymentMethodsController@getALl');
+            Route::get('/get', 'PaymentMethodsController@getAll');
             Route::get('/get/{storeId}', 'PaymentMethodsController@getByStore');
             Route::post('/assigning/{storeId}', 'PaymentMethodsController@assigningToStore');
             Route::post('/delete/{storeId}/{paymentId}', 'PaymentMethodsController@deleteFromStore');

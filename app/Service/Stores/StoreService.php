@@ -5,6 +5,9 @@ namespace App\Service\Stores;
 use App\Models\Images\Banner;
 use App\Models\Stores\Store;
 use App\Models\Stores\StoreTranslation;
+use App\Models\User;
+use App\Notifications\StoreRegistration;
+use App\Notifications\SendRequest;
 use App\Scopes\BrandScope;
 use App\Service\Attachments\AttachmentService;
 use App\Service\SocialMedia\SocialMediaService;
@@ -14,6 +17,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use App\Mail\SendRequest1;
 
 
 class  StoreService
@@ -25,9 +31,11 @@ class  StoreService
     private $banner;
     private $SocialMediaService;
     private $subscriptionService;
+    private $user;
 
     public function __construct(Store $store, StoreTranslation $storeTranslation,
-                                Banner $banner, AttachmentService $attachmentsService,
+                                Banner $banner,User $user,
+                                AttachmentService $attachmentsService,
                                 SubscriptionsService $subscriptionService,
                                 SocialMediaService $SocialMediaService)
     {
@@ -37,6 +45,7 @@ class  StoreService
         $this->banner = $banner;
         $this->SocialMediaService = $SocialMediaService;
         $this->subscriptionService = $subscriptionService;
+        $this->user = $user;
     }
 
     private function fillStore($request_arr, $store_social, $logo_folder)
@@ -133,7 +142,7 @@ class  StoreService
                 }, 'StoreProduct' => function ($q) use ($store_id) {
                     return $q->where('store_id', $store_id)->get();
                 }])->get();
-            }, 'Section', 'Brand', 'StoreImage'])->find($store_id);
+            }, 'Section', 'Brand'])->find($store_id);
             return is_null($store) ? $this->returnSuccessMessage('Store', 'stores doesnt exist yet') :
                 $this->returnData('Stores', $store, 'done');
         } catch (\Exception $ex) {
@@ -184,8 +193,16 @@ class  StoreService
     public function create($request)
     {
         try {
-//            return $request;
+            $front=collect($request);
             /***  //transformation to collection*////
+             $admin=User::where('email','superadministrator@app.com')->findOrFail(1);
+//             $alaa='fahed9285@gmail.com';
+//            Notification::send($alaa, new SendRequest($request,$alaa));
+//            Mail::send('email.sendmail',compact('front'),
+//                function ($message){
+//                    $message->to('fahed8592@gmail.com','laravel')
+//                    ->subject('store register request');
+//                });
             $stores = collect($request->store)->all();
             $attachments = collect($request->attachments);
             $subscriptions = collect($request->subscriptions)->all();
@@ -218,6 +235,7 @@ class  StoreService
                 }
             }
             DB::commit();
+            Notification::send($admin, new StoreRegistration($admin,$unTransStore_id));
             return $this->returnData('Store', [$unTransStore_id, $transStore_arr], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
@@ -336,10 +354,10 @@ class  StoreService
     public function account($storeId)
     {
         try {
-            $store = $this->storeModel->find($storeId);
+            $store = $this->storeModel->with('Shipping_Method','Banner')->find($storeId);
             return is_null($store) ?
                 $this->returnSuccessMessage('Store', 'This stores not found') :
-                $this->returnData('Category', $store, 'This Store Is deleted Now');
+                $this->returnData('Store', $store, 'Done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('store', $ex->getMessage());
@@ -371,13 +389,16 @@ class  StoreService
         }
     }
 
-    public function updateBanner(Request $request, $bannerId, $storeId)
+    public function updateBanner($request, $bannerId, $storeId)
     {
         try {
+//            return $request;
             $folder = public_path('images/stores/banners' . '/' . $storeId . '/');
-            $banner = $this->banner->find($bannerId);
+             $banner = $this->banner->find($bannerId);
+             $file=$banner->image;
+//            File::delete($file);
             $banner->update([
-                'image' => $this->upload($request['image'], $folder),
+                'image' => $this->upload($request['image'],$folder),
                 'description' => $request['description'],
                 'is_active' => $request['is_active'],
                 'is_appear' => $request['is_appear']
@@ -432,5 +453,14 @@ class  StoreService
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
+    }
+
+    public function sendMail()
+    {
+        $details=[
+            'title'=>'test',
+            'bode'=>'test'
+        ];
+        Mail::to('fahed8592@gmail.com',)->send(new SendRequest1($details));
     }
 }
