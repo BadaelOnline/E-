@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use TheSeer\Tokenizer\Exception;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class ShippingMethodsServices
@@ -23,43 +24,61 @@ class ShippingMethodsServices
 
     use GeneralTrait;
 
-    public function __construct(Shipping_Method $shipping,Store $storemodel)
+    public function __construct(Shipping_Method $shipping, Store $storemodel)
     {
         $this->shipping = $shipping;
         $this->storemodel = $storemodel;
     }
+
     /****Get All  plans  ****/
     public function getAll()
     {
         try {
             $shipping = $this->shipping->get();
             return count($shipping) > 0 ?
-                $this->returnData('shipping', $shipping, 'done'):
+                $this->returnData('shipping', $shipping, 'done') :
                 $this->returnSuccessMessage('shipping', 'shipping doesnt exist yet');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
     }
-    public function assigningToStore(Request $request,$storeId)
+
+    public function assigningToStore(Request $request, $storeId)
     {
-        if ($request->has('shipping_methods')) {
-            $store = $this->storemodel->find($storeId);
-            $store->Shipping_Method()->syncWithoutDetaching($request->get('shipping_methods'));
-            return $store->with('Shipping_Method')->get();
+        try{
+            if ($request->has('shipping_methods')) {
+                $store = $this->storemodel->find($storeId);
+                $store->Shipping_Method()->syncWithoutDetaching($request->get('shipping_methods'));
+                return $this->returnSuccessMessage('done','201');
+            }
+        }catch(\Exception $ex){
+           return  $this->returnError('400',$ex->getMessage());
         }
     }
-    public function deleteFromStore($shippingId,$storeId)
+
+    public function deleteFromStore($shippingId, $storeId)
     {
-        $store = $this->storemodel->find($storeId);
-        $store->Shipping_Method()->detach($shippingId);
-        return $store->with('Shipping_Method')->get();
+        try{
+            $store = $this->storemodel->find($storeId);
+            $store->Shipping_Method()->detach($shippingId);
+            return $this->returnSuccessMessage('200','success item deleted');
+        }catch(\Exception $ex)
+        {
+            return $this->returnError('400',$ex->getMessage());
+        }
     }
+
     public function getByStore($storeId)
     {
-        $store = $this->storemodel->with('Shipping_Method')->find($storeId);
-        return is_null($store)  ?
-            $this->returnSuccessMessage('store Shipping_Method', 'store doesnt exist yet'):
-            $this->returnData('store Shipping_Method', $store, 'done');
+        try{
+            $store = $this->storemodel->with('Shipping_Method')->find($storeId);
+            return is_null($store) ?
+                $this->returnSuccessMessage('store Shipping_Method', 'store doesnt exist yet') :
+                $this->returnData('store Shipping_Method', $store, 'done');
+        }catch(\Exception $ex)
+        {
+            return $this->returnError('400',$ex->getMessage());
+        }
     }
     /*__________________________________________________________________*/
     /****Get Active plan By ID  ***
@@ -72,11 +91,11 @@ class ShippingMethodsServices
 //            Gate::authorize('Read Brand');
             $shipping = $this->shipping->findOrFail($id);
             if (!isset($shipping)) {
-                return  $this->returnSuccessMessage('This shipping not found', 'done');
+                return $this->returnSuccessMessage('This shipping not found', 'done');
             }
-            return  $this->returnData('shipping', $shipping, 'done');
+            return $this->returnData('shipping', $shipping, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
@@ -110,14 +129,14 @@ class ShippingMethodsServices
         try {
             $shipping = $this->shipping->find($id);
             if (is_null($shipping)) {
-                return  $this->returnSuccessMessage('shipping', 'This shipping not found');
+                return $this->returnSuccessMessage('shipping', 'This shipping not found');
             } else {
                 $shipping->is_active = true;
                 $shipping->save();
                 return $this->returnData('shipping', $shipping, 'This shipping Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -157,8 +176,8 @@ class ShippingMethodsServices
             /** create the default language's ActivityType **/
             $unTransshippingid = $this->shipping->insertGetId([
                 'is_active' => $request['is_active'],
-                'activity_id'=> $request['activity_id'],
-                'price_per_month'=> $request['price_per_month']
+                'activity_id' => $request['activity_id'],
+                'price_per_month' => $request['price_per_month']
             ]);
             /** check the ActivityType and request */
             if (isset($allshippings) && count($allshippings)) {
@@ -173,7 +192,7 @@ class ShippingMethodsServices
                 $this->shippingTranslation->insert($transshipping_arr);
             }
             DB::commit();
-            return $this->returnData('shipping', [$unTransshippingid,$allshippings], 'done');
+            return $this->returnData('shipping', [$unTransshippingid, $allshippings], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('shipping', $ex->getMessage());
@@ -199,8 +218,8 @@ class ShippingMethodsServices
             $unTransplan_id = $this->plan->where('plans.id', $id)
                 ->update([
                     'is_active' => $request['is_active'],
-                    'activity_id'=> $request['activity_id'],
-                    'price_per_month'=> $request['price_per_month']
+                    'activity_id' => $request['activity_id'],
+                    'price_per_month' => $request['price_per_month']
                 ]);
             $request_plans = array_values($request->plan);
             foreach ($request_plans as $request_plan) {
@@ -213,7 +232,7 @@ class ShippingMethodsServices
                     ]);
             }
             DB::commit();
-            return $this->returnData('plan', [$id,$request_plans], 'done');
+            return $this->returnData('plan', [$id, $request_plans], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
@@ -228,7 +247,7 @@ class ShippingMethodsServices
     {
         try {
             $shipping = $this->shipping->find($id);
-            $shipping ->destroy($id);
+            $shipping->destroy($id);
             return $this->returnData('shipping', $shipping, 'This shipping Is deleted Now');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());

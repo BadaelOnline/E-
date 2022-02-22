@@ -3,6 +3,7 @@
 namespace App\Service\Attachments;
 
 use App\Models\Attachments\Attachment;
+use App\Models\Attachments\Attachment_Type;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -15,22 +16,23 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 class AttachmentService
 {
     private $attachment;
+    private $attachment_type;
     private $PAGINATION_COUNT;
 
     use GeneralTrait;
 
-    public function __construct(Attachment $attachment)
+    public function __construct(Attachment $attachment,Attachment_Type $attachment_type)
     {
         $this->attachment = $attachment;
+        $this->attachment_type = $attachment_type;
         $this->PAGINATION_COUNT = 25;
     }
 
-    private function fillAttachment($request_arr, $record_num, $folder, $activity_id)
+    private function fillAttachment($request_arr, $record_num, $folder)
     {
         return (
         [
             'path' => $this->upload($request_arr['path'], $folder),
-            'activity_id' => $activity_id,
             'attachments_type_id' => $request_arr['attachments_type_id'],
             'record_num' => $record_num
         ]);
@@ -76,7 +78,7 @@ class AttachmentService
     public function getByActivity($activity_id)
     {
         try {
-            $attachment = $this->attachment->where('activity_id', $activity_id)->get();
+            $attachment = $this->attachment_type->where('activity_id', $activity_id)->get();
             return !isset($attachment) ?
                 $this->returnSuccessMessage('This attachment not found', 'done') :
                 $this->returnData('attachment', $attachment, 'done');
@@ -149,13 +151,13 @@ class AttachmentService
     /****  Create attachment   ***
      * @return JsonResponse
      */
-    public function create($request, $record_num, $activity_id)
+    public function create($request, $record_num)
     {
         try {
             DB::beginTransaction();
             $folder = public_path('images/attachments/stores' . '/' . $record_num . '/');
             $attachment = $this->attachment->create(
-                $this->fillAttachment($request, $record_num, $folder, $activity_id)
+                $this->fillAttachment($request, $record_num, $folder)
             );
             DB::commit();
             return $this->returnData('attachment', $attachment, 'done');

@@ -25,14 +25,15 @@ class CurrenciesService
         $this->currencyModel = $currency;
         $this->PAGINATION_COUNT = 25;
     }
+
     /****Get All Currencies  ****/
     public function getAll()
     {
         try {
             $currencies = $this->currencyModel->get();
             return count($currencies) > 0 ?
-                 $this->returnData('Currency', $currencies, 'done'):
-                 $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet');
+                $this->returnData('Currency', $currencies, 'done') :
+                $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet');
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
         }
@@ -47,10 +48,10 @@ class CurrenciesService
         try {
             $currencies = $this->currencyModel->findOrFail($id);
             return is_null($currencies) > 0 ?
-                $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet'):
+                $this->returnSuccessMessage('Currency', 'Currencies doesnt exist yet') :
                 $this->returnData('Currency', $currencies, 'done');
         } catch (\Exception $ex) {
-            if ($ex instanceof TokenExpiredException){
+            if ($ex instanceof TokenExpiredException) {
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
@@ -95,7 +96,7 @@ class CurrenciesService
                 return $this->returnData('Brand', $brand, 'This Brand Is trashed Now');
             }
         } catch (\Exception $ex) {
-            if($ex instanceof AccessDeniedException)
+            if ($ex instanceof AccessDeniedException)
                 return $this->returnError('400', $ex->getMessage());
         }
     }
@@ -142,7 +143,7 @@ class CurrenciesService
             $unTransBrand_id = $this->BrandModel->insertGetId([
                 'slug' => $request['slug'],
                 'is_active' => $request['is_active'],
-                'image' => $this->upload( $request['image'],$folder),
+                'image' => $this->upload($request['image'], $folder),
             ]);
             //check the Brand and request
             if (isset($allbrands) && count($allbrands)) {
@@ -158,7 +159,7 @@ class CurrenciesService
                 $this->brandTranslation->insert($transBrand_arr);
             }
             DB::commit();
-            return $this->returnData('Brand', [$unTransBrand_id,$allbrands], 'done');
+            return $this->returnData('Brand', [$unTransBrand_id, $allbrands], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('Brand', $ex->getMessage());
@@ -198,12 +199,13 @@ class CurrenciesService
                     ]);
             }
             DB::commit();
-            return $this->returnData('Brand', [$id,$request_brands], 'done');
+            return $this->returnData('Brand', [$id, $request_brands], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->returnError('400', $ex->getMessage());
         }
     }
+
     /*__________________________________________________________________*/
     public function search($title)
     {
@@ -232,7 +234,7 @@ class CurrenciesService
 
             $brand = $this->BrandModel->find($id);
 
-            $brand ->destroy($id);
+            $brand->destroy($id);
             return $this->returnData('Brand', $brand, 'This Brand Is deleted Now');
 
 
@@ -240,33 +242,36 @@ class CurrenciesService
             return $this->returnError('400', $ex->getMessage());
         }
     }
-    public function upload($image,$folder)
+
+    public function upload($image, $folder)
     {
         $folder = public_path('images/brands' . '/');
         $filename = time() . '.' . $image->getClientOriginalName();
-        $imageUrl[]='images/brands/' .  $filename;
+        $imageUrl[] = 'images/brands/' . $filename;
         if (!File::exists($folder)) {
             File::makeDirectory($folder, 0775, true, true);
         }
-        $image->move($folder,$filename);
+        $image->move($folder, $filename);
         return $filename;
     }
+
     public function update_upload(Request $request, $id)
     {
-        $brand= $this->BrandModel->find($id);
+        $brand = $this->BrandModel->find($id);
         if (!isset($brand)) {
             return $this->returnSuccessMessage('This Brand not found', 'done');
         }
-        $old_image=$brand->image;
+        $old_image = $brand->image;
         $image = $request->file('image');
-        $old_images=public_path('images/brands' . '/' .$old_image);
-        if(File::exists($old_images)){
+        $old_images = public_path('images/brands' . '/' . $old_image);
+        if (File::exists($old_images)) {
             unlink($old_images);
         }
         $folder = public_path('images/brands' . '/');
         $filename = time() . '.' . $image->getClientOriginalName();
-        $brand->update(['image' => $filename]);/**update in database**/
-        $image->move($folder,$filename);
+        $brand->update(['image' => $filename]);
+        /**update in database**/
+        $image->move($folder, $filename);
         return $filename;
     }
 }

@@ -85,6 +85,7 @@ class DatabaseSeeder extends Seeder
             OrderDetailsSeeder::class,
             ActivityTypeSeeder::class,
             AttachmentSeeder::class,
+            AttachmentTypeSeeder::class,
             BannerSeeder::class,
             StoreUserSeeder::class,
             StorePaymentSeeder::class,

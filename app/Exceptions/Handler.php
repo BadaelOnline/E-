@@ -46,6 +46,7 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $exception) {
             //
+                       return $this->handleException($exception);
         });
         $this->renderable(function (TokenInvalidException $e, $request) {
             return Response::json(['error' => 'Invalid token'], 401);
@@ -66,9 +67,9 @@ class Handler extends ExceptionHandler
 //        $this->renderable(function (JWTException $ex) {
 //            return $this->returnError(403, 'unauthorized,Please Login Or Register');
 //        });
-//        $this->renderable(function (Throwable $e) {
-//            return $this->handleException($e);
-//        });
+        $this->renderable(function (Throwable $e) {
+            return $this->handleException($e);
+        });
     }
 
     public function handleException(Throwable $e)

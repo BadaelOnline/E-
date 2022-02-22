@@ -14,6 +14,7 @@ class CreateStoreShippingTable extends Migration
     public function up()
     {
         Schema::create('store_shipping', function (Blueprint $table) {
+//            $table->id();
             $table->unsignedInteger('store_id');
             $table->unsignedInteger('shipping_id');
             $table->primary(['store_id', 'shipping_id']);

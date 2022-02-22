@@ -50,7 +50,7 @@ class GeneralHandler extends Exception
                     [
                         'success' => false,
                         'message' => 'There was Issue with the Query',
-                        'exception' => $exception
+                        'exception' => 'asd'
                     ],
                     500
                 );
