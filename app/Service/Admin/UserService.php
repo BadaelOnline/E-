@@ -4,19 +4,19 @@ namespace App\Service\Admin;
 
 use App\Models\Admin\Role;
 use App\Models\Admin\TransModel\UserTranslation;
-//use App\Models\Order\Order;
-use App\Models\Admin\TypeUser;
 use App\Models\User;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
+//use App\Models\Order\Order;
 
 class UserService
 {
 
     use GeneralTrait;
+
     private $userModel;
     private $roleModel;
     private $userTranslation;
@@ -206,7 +206,6 @@ class UserService
                 'image' => $request->image,
                 'password' =>bcrypt($request->password)
             ]);
-
             $ss=$this->userTranslation->where('user_translation.user_id',$id);
             $collection1 = collect($allusers);
             $alluserslength=$collection1->count();
@@ -231,13 +230,11 @@ class UserService
                         ]);
                 }
             }
-
             $token = JWTAuth::fromUser($user);
             if ($request->has('roles')) {
                 $role = $this->userModel->find($user->id);
                 $role->roles()->syncWithoutDetaching($request->get('roles'));
-            }
-            if ($request->has('permissions')) {
+            }if ($request->has('permissions')) {
                 $permissions = $this->userModel->find($user->id);
                 $permissions->permissions()->syncWithoutDetaching($request->get('permissions'));
             }
@@ -257,12 +254,9 @@ class UserService
             $user = DB::table('users')
                 ->where("name","like","%".$name."%")
                 ->get();
-            if (!$user)
-            {
+            if (!$user) {
                 return $this->returnError('400', 'not found this user');
-            }
-            else
-            {
+            } else {
                 return $this->returnData('user', $user,'done');
             }
         }catch(\Exception $ex){
@@ -300,9 +294,8 @@ class UserService
             }else{
                 return $response= $this->returnData('User',$user,'done');
             }
+        } catch(\Exception $ex) {
+            return $this->returnError ('400', $ex->getMessage ());
         }
-        catch(\Exception $ex){
-return $this->returnError('400', $ex->getMessage());
-}
     }
 }

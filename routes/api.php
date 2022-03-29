@@ -157,12 +157,9 @@ Route::group(
             Route::GET('/viewStoresHasProduct/{id}', 'StoresProductsController@viewStoresHasProduct');
             Route::GET('/viewProductsInStore/{id}', 'StoresProductsController@viewProductsInStore');
             Route::GET('/rangeOfPrice/{id}', 'StoresProductsController@rangeOfPrice');
-
             Route::PUT('/prices/{store_id}', 'StoresProductsController@updateMultyProductsPricesInStore');
             Route::PUT('/ratio/{store_id}', 'StoresProductsController@updatePricesPyRatio');
             Route::GET('/account/{storeId}', 'StoreController@account');
-
-
         });
 ########################## DOCTOR ROUTE #########################################
 
@@ -424,25 +421,24 @@ Route::group(
             Route::get('/restaurant/item/get-product/{item_id}', 'ItemController@getProduct');
         });
         Route::get('/restaurants/item/gettrashed', [ItemController::class, 'getTrashed']);
-
         Route::Post('upload', 'TestController@store');
         ################ OFFERS ROUTE ##################################
         //////////////// offers Route ////////////////////////////
-        Route::group(['namespace' => 'Offer'], function () {
-            Route::get('/offers', 'OfferController@get');
-            Route::get('/offer/{id}', 'OfferController@getById');
-            Route::post('/offer/create', 'OfferController@create');
-            Route::put('/offer/{id}', 'OfferController@update');
-            Route::PUT('/offer/trash/{id}', 'OfferController@trash');
-            Route::PUT('/offer/restoretrashed/{id}', 'OfferController@restoreTrashed');
-            Route::delete('/offer/{id}', 'OfferController@delete');
-            Route::get('/offer/get-store/{Offer_id}', 'OfferController@getStoreByOfferId');
-            Route::get('/offer/get-offer/{store_id}', 'OfferController@getOfferByStoreId');
+        Route::group(['namespace' => 'Offer','prefix' => 'offer'], function () {
+            Route::get('/', 'OfferController@get');
+            Route::get('/{id}', 'OfferController@getById');
+            Route::post('/create', 'OfferController@create');
+            Route::put('/{id}', 'OfferController@update');
+            Route::PUT('/trash/{id}', 'OfferController@trash');
+            Route::PUT('/restoretrashed/{id}', 'OfferController@restoreTrashed');
+            Route::delete('/{id}', 'OfferController@delete');
+            Route::get('/get-store/{Offer_id}', 'OfferController@getStoreByOfferId');
+            Route::get('/get-offer/{store_id}', 'OfferController@getOfferByStoreId');
         });
-        Route::get('offers/gettrashed', [OfferController::class, 'getTrashed']);
-        Route::get('offer/get-advertisement', [OfferController::class, 'get_advertisement']);
-        //////////////// Comment  Route ////////////////////////////
+        Route::get('offers/gettrashed', [OfferController::class,'getTrashed']);
+        Route::get('/get-advertisement', [OfferController::class,'getAdvertisement']);
 
+        //////////////// Comment  Route ////////////////////////////
         Route::group(['namespace' => 'Comment'], function () {
             Route::get('/comments', 'CommentController@get');
             Route::get('/comment/{id}', 'CommentController@getById');
