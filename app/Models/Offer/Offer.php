@@ -13,10 +13,10 @@ class Offer extends Model
     use HasFactory;
 
     protected $table='offers';
-    protected  $fillable=['id','user_email','image','store_id','store_product_id','price','selling_price','quantity'
-    ,'started_at','ended_at','position','is_active','is_offer'];
+    protected  $fillable=['id','user_email','store_id','store_product_id','offer_price','selling_quantity'
+    ,'started_at','ended_at','is_active','is_offer'];
 
-    protected $hidden=['position','store_id','store_product_id','created_at','updated_at'];
+    protected $hidden=['store_id','store_product_id','created_at','updated_at'];
 
     //local scope
     public function scopeNotActive($query)
@@ -25,7 +25,7 @@ class Offer extends Model
     }
     public function scopeAdvertisement($query)
     {
-        return $query->select('id','image')->where('is_active',1)->get();
+        return $query->select('id')->where('is_active',1)->get();
     }
 
     public function OfferTranslation()

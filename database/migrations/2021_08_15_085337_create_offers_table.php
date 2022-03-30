@@ -18,11 +18,11 @@ class CreateOffersTable extends Migration
             $table->integer('store_id')->unsigned();
             $table->integer('store_product_id')->unique();
             $table->string('user_email');
-            $table->string('image');
-            $table->integer('position');
-            $table->integer('price');
-            $table->integer('selling_price');
-            $table->integer('quantity');
+//            $table->string('image');
+//            $table->integer('position');
+//            $table->integer('price');
+            $table->integer('offer_price');
+            $table->integer('selling_quantity');
             $table->dateTime('started_at');
             $table->dateTime('ended_at');
             $table->boolean('is_active');

@@ -11,20 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class OfferService
 {
-
     use GeneralTrait;
     protected $OfferModel;
     protected $StoreModel;
-
     public function __construct(Offer $offer,Store $store)
     {
         $this->OfferModel=$offer;
         $this->StoreModel=$store;
     }
 
-    //get all offer
-    public function get ()
-    {
+    public function get (){
         try {
             $offer = $this->OfferModel::paginate (5);
             return $this->returnData ('Offer', $offer, 'Done');
@@ -33,9 +29,7 @@ class OfferService
         }
     }
 
-    //get offer by offer's id
-    public function getById ($id)
-    {
+    public function getById ($id){
         try {
             $offer = $this->OfferModel::find ($id);
             if (!$offer) {
@@ -48,40 +42,35 @@ class OfferService
         }
     }
 
-    //create new offer
-    public function create(OfferRequest $request)
-    {
+    public function create($request){
         try {
-            $offer=collect($request->Offer)->all();
+            $offers = collect($request->Offer)->all();
             DB::beginTransaction();
-            $untransId=$this->OfferModel::insertGetId([
-                'store_id'        =>$request->store_id,
-                'store_product_id'=>$request->store_product_id,
-                'user_email'      =>$request->user_email,
-                'image'           =>$request->image,
-                'price'           =>$request->price,
-                'selling_price'   =>$request->selling_price,
-                'quantity'        =>$request->quantity,
-                'position'        =>$request->position,
-                'started_at'      =>$request->started_at,
-                'ended_at'        =>$request->ended_at,
-                'is_active'       =>$request->is_active,
-                'is_offer'        =>$request->is_offer
+            $unTransOffer_Id = $this->OfferModel::insertGetId([
+                'store_id'         =>$request->store_id,
+                'store_product_id' =>$request->store_product_id,
+                'user_email'       =>$request->user_email,
+                'offer_price'      =>$request->offer_price,
+                'selling_quantity' =>$request->selling_quantity,
+                'started_at'       =>$request->started_at,
+                'ended_at'         =>$request->ended_at,
+                'is_active'        =>$request->is_active,
+                'is_offer'         =>$request->is_offer
             ]);
-             if(isset($offer)) {
-                 foreach ($offer as $offers) {
-                     $transOffer[] = [
-                         'name' => $offers ['name'],
-                         'short_description' => $offers['short_description'],
-                         'long_description' => $offers['long_description'],
-                         'locale' => $offers['locale'],
-                         'offer_id' => $untransId,
+             if(isset($offers) && count($offers)) {
+                 foreach ($offers as $offer) {
+                     $transOffer_arr[] = [
+                         'name' => $offer ['name'],
+                         'short_description' => $offer['short_description'],
+                         'long_description' => $offer['long_description'],
+                         'locale' => $offer['locale'],
+                         'offer_id' => $unTransOffer_Id,
                      ];
                  }
-                 OfferTranslation::insert ($transOffer);
+                 OfferTranslation::insert ($transOffer_arr);
              }
             DB::commit ();
-            return $this->returnData ('offer', [$untransId, $transOffer], 'done');
+            return $this->returnData ('offer', [$unTransOffer_Id, $transOffer_arr], 'done');
 //            Mail::To ($untransId->user_email)->send (new OfferMail($untransId->user_email));
 //            return $this->returnData ('email', $eamil, 'An email has been sent to you');
         } catch (\Exception $ex) {
@@ -90,59 +79,53 @@ class OfferService
         }
     }
 
-//update old offer
-    public function update(OfferRequest $request,$id)
-    {
-      Try
-      {
-          $offer=$this->OfferModel::find($id);
+    public function update(OfferRequest $request,$id){
+      Try {
+          $offer = $this->OfferModel::findOrFail($id);
+          DB::beginTransaction();
           if(!$offer)
-          {return $this->returnError('400','not found this offer');}
-          $alloffer=collect($request->Offer)->all();
-          if(!($request->has('offers.is_active')))
-          $request->request->add(['is_active'=>0]);
-          else{$request->request->add(['is_active',1]);}
-
-          $newoffer=$this->OfferModel::where('offers.id',$id)->update([
+            return $this->returnError('400','not found this offer');
+          if (!($request->has('offers.is_active')))
+              $request->request->add(['is_active'=>0]);
+          else
+              $request->request->add(['is_active',1]);
+          $offers = collect($request->Offer)->all();
+          $unTransOffer_Id = $this->OfferModel::where('offers.id',$offer->id)->update([
               'store_id'        =>$request->store_id,
               'store_product_id'=>$request->store_product_id,
               'user_email'      =>$request->user_email,
-              'image'           =>$request->image,
-              'price'           =>$request->price,
-              'selling_price'   =>$request->selling_price,
-              'quantity'        =>$request->quantity,
-              'position'        =>$request->position,
+              'offer_price'   =>$request->offer_price,
+              'selling_quantity'        =>$request->selling_quantity,
               'started_at'      =>$request->started_at,
               'ended_at'        =>$request->ended_at,
               'is_active'       =>$request->is_active,
               'is_offer'        =>$request->is_offer
           ]);
-          $db_offer=array_values(OfferTranslation::where('offer_translations.offer_id',$id)
+          $db_offers=array_values(OfferTranslation::where('offer_translations.offer_id',$id)
               ->get()->all());
-          $dboffer=(array_values($db_offer));
-          $request_offer=(array_values($request->Offer));
-          foreach ($dboffer as $dboffers){
-              foreach ($request_offer as $request_offers){
-                  $value = OfferTranslation::where ('offer_translations.offer_id', $id)
-                      ->where ('locale', $request_offers['locale'])
+          $dboffers=(array_values($db_offers));
+          $offers =(array_values($request->Offer));
+          foreach ($dboffers as $dboffer){
+              //insert other translations for Offer
+              foreach ($offers  as $offer){
+                  OfferTranslation::where ('offer_translations.offer_id', $id)
+                      ->where ('locale', $offer['locale'])
                       ->update ([
-                          'name' => $request_offers['name'],
-                          'short_description' => $request_offers['short_description'],
-                          'long_description' => $request_offers['long_description'],
-                          'offer_id' => $id
+                          'name' => $offer['name'],
+                          'short_description' => $offer['short_description'],
+                          'long_description' => $offer['long_description'],
+                          'offer_id' =>$unTransOffer_Id
                       ]);
               }
           }
           DB::commit ();
-          return $this->returnData ('offer', [$dboffer, $value], 'done');
+          return $this->returnData ('offer', [$offers], 'done');
       } catch (\Exception $ex) {
           return $this->returnError ($ex->getCode (), $ex->getMessage ());
       }
     }
 
-    // change is_active value to zero
-    public function Trash ($id)
-    {
+    public function Trash ($id){
         try {
             $offer = $this->OfferModel::find ($id);
             if (!$offer) {
@@ -157,9 +140,7 @@ class OfferService
         }
     }
 
-    //change is_active value to one
-    public function restoreTrashed ($id)
-    {
+    public function restoreTrashed ($id){
         try {
             $offer = $this->OfferModel::find ($id);
             if (!$offer) {
@@ -174,11 +155,8 @@ class OfferService
         }
     }
 
-    //delete the offer from database
-    public function delete($id)
-    {
-        try
-        {
+    public function delete($id){
+        try {
             $offer=$this->OfferModel::find($id);
             if (!$offer) {
                 return $this->returnError ('400', 'not found this offer');
@@ -194,9 +172,7 @@ class OfferService
         }
     }
 
-    //Find out the store that offers this offer through this offer ID
-    public function getStoreByOfferId($Offer_id)
-    {
+    public function getStoreByOfferId($Offer_id){
         try {
             $offer = $this->OfferModel::find ($Offer_id);
             if (!$offer) {
@@ -210,9 +186,7 @@ class OfferService
         }
     }
 
-    //Find out about store offers via store ID
-    public function getOfferByStoreId ($Store_id)
-    {
+    public function getOfferByStoreId ($Store_id){
         try {
             $store = $this->StoreModel::find ($Store_id);
             if (!$store) {
@@ -226,10 +200,7 @@ class OfferService
         }
     }
 
-//_____________________________________________________________________________//
-//get offer where is_Active=0
-    public function getTrashed ()
-    {
+    public function getTrashed (){
         try {
             $offer = $this->OfferModel::NotActive ();
             return $this->returnData ('offer', $offer, 'done');
@@ -238,9 +209,7 @@ class OfferService
         }
     }
 
-    //get the advertisement
-    public function getAdvertisement ()
-    {
+    public function getAdvertisement (){
         try {
             $offer = $this->OfferModel::Advertisement ();
             return $this->returnData ('advertisement', $offer, 'this is advertisements');
