@@ -22,8 +22,9 @@ class OfferService
 
     public function get (){
         try {
-            $offer = $this->OfferModel::paginate (5);
-            return $this->returnData ('Offer', $offer, 'Done');
+            $offers = $this->OfferModel::with('storeProduct')
+                ->paginate(5);
+            return $this->returnData ('Offer', $offers, 'Done');
         } catch (\Exception $ex) {
             return $this->returnError ($ex->getCode (), $ex->getMessage ());
         }
@@ -31,7 +32,9 @@ class OfferService
 
     public function getById ($id){
         try {
-            $offer = $this->OfferModel::find ($id);
+            $offer = $this->OfferModel::find ($id)
+                ->with('storeProduct')
+                ->get();
             if (!$offer) {
                 return $this->returnError ('400', 'not found this offer');
             } else {
@@ -47,8 +50,6 @@ class OfferService
             $offers = collect($request->Offer)->all();
             DB::beginTransaction();
             $unTransOffer_Id = $this->OfferModel::insertGetId([
-                'store_id'         =>$request->store_id,
-                'store_product_id' =>$request->store_product_id,
                 'user_email'       =>$request->user_email,
                 'offer_price'      =>$request->offer_price,
                 'selling_quantity' =>$request->selling_quantity,
@@ -61,14 +62,18 @@ class OfferService
                  foreach ($offers as $offer) {
                      $transOffer_arr[] = [
                          'name' => $offer ['name'],
-                         'short_description' => $offer['short_description'],
-                         'long_description' => $offer['long_description'],
+                         'short_desc' => $offer['short_desc'],
+                         'long_desc' => $offer['long_desc'],
                          'locale' => $offer['locale'],
                          'offer_id' => $unTransOffer_Id,
                      ];
                  }
                  OfferTranslation::insert ($transOffer_arr);
              }
+            if ($request->has('storeProduct')) {
+                $store_product = $this->OfferModel->find($unTransOffer_Id);
+                $store_product->storeProduct()->syncWithoutDetaching($request->get('storeProduct'));
+            }
             DB::commit ();
             return $this->returnData ('offer', [$unTransOffer_Id, $transOffer_arr], 'done');
 //            Mail::To ($untransId->user_email)->send (new OfferMail($untransId->user_email));
@@ -91,15 +96,13 @@ class OfferService
               $request->request->add(['is_active',1]);
           $offers = collect($request->Offer)->all();
           $unTransOffer_Id = $this->OfferModel::where('offers.id',$offer->id)->update([
-              'store_id'        =>$request->store_id,
-              'store_product_id'=>$request->store_product_id,
-              'user_email'      =>$request->user_email,
-              'offer_price'   =>$request->offer_price,
-              'selling_quantity'        =>$request->selling_quantity,
-              'started_at'      =>$request->started_at,
-              'ended_at'        =>$request->ended_at,
-              'is_active'       =>$request->is_active,
-              'is_offer'        =>$request->is_offer
+              'user_email'       =>$request->user_email,
+              'offer_price'      =>$request->offer_price,
+              'selling_quantity' =>$request->selling_quantity,
+              'started_at'       =>$request->started_at,
+              'ended_at'         =>$request->ended_at,
+              'is_active'        =>$request->is_active,
+              'is_offer'         =>$request->is_offer
           ]);
           $db_offers=array_values(OfferTranslation::where('offer_translations.offer_id',$id)
               ->get()->all());
@@ -112,11 +115,15 @@ class OfferService
                       ->where ('locale', $offer['locale'])
                       ->update ([
                           'name' => $offer['name'],
-                          'short_description' => $offer['short_description'],
-                          'long_description' => $offer['long_description'],
+                          'short_desc' => $offer['short_desc'],
+                          'long_desc' => $offer['long_desc'],
                           'offer_id' =>$unTransOffer_Id
                       ]);
               }
+          }
+          if ($request->has('storeProduct')) {
+              $store_product = $this->OfferModel->find($unTransOffer_Id);
+              $store_product->storeProduct()->syncWithoutDetaching($request->get('storeProduct'));
           }
           DB::commit ();
           return $this->returnData ('offer', [$offers], 'done');

@@ -15,12 +15,7 @@ class CreateOffersTable extends Migration
     {
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
-            $table->integer('store_id')->unsigned();
-            $table->integer('store_product_id')->unique();
             $table->string('user_email');
-//            $table->string('image');
-//            $table->integer('position');
-//            $table->integer('price');
             $table->integer('offer_price');
             $table->integer('selling_quantity');
             $table->dateTime('started_at');

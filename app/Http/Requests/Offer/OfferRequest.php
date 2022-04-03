@@ -25,17 +25,16 @@ class OfferRequest extends FormRequest
     {
         return [
             'user_email'      =>'required|email',
-            'store_id'        =>'required:integer',
-            'store_product_id'=>'required:integer',
+            'storeProduct'        =>'required',
             'offer_price'   =>'required:integer',
             'selling_quantity'        =>'required:integer',
             'started_at'      =>'required',
             'ended_at'        =>'required',
             'is_active'       =>'required|in:1,0',
             'is_offer'        =>'required|in:1,0',
-
         ];
     }
+
     public function messages()
     {
         return[
