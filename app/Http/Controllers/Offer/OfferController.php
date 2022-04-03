@@ -56,10 +56,11 @@ class OfferController extends Controller
         return $this->OfferService->getOfferByStoreId($Store_id);
     }
     /////////////////////////////////////////////////////////////////////////
-    public function get_advertisement()
+    public function getAdvertisement()
     {
-        return $this->OfferService->get_advertisement();
+        return $this->OfferService->getAdvertisement();
     }
+
     public function getTrashed()
     {
         return $this->OfferService->getTrashed();

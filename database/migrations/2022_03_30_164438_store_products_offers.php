@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOfferTranslationsTable extends Migration
+class StoreProductsOffers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateOfferTranslationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('offer_translations', function (Blueprint $table) {
+        Schema::create('store_products_offers', function (Blueprint $table) {
             $table->id();
-            $table->integer('offer_id')->unsigned();
-            $table->string('locale');
-            $table->string('name');
-            $table->string('short_desc');
-            $table->string('long_desc');
+            $table->foreignId('offer_id')->index();
+            $table->foreignId('store_product_id')->index();
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateOfferTranslationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('offer_translations');
+        //
     }
 }
