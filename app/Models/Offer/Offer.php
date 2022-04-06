@@ -3,7 +3,7 @@
 namespace App\Models\Offer;
 
 use App\Models\Comment\Comment;
-use App\Models\Products\Product;
+use App\Models\Stores\StoreProduct;
 use App\Scopes\OfferScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,10 +40,11 @@ class Offer extends Model
         return $this->hasMany (OfferTranslation::class,'offer_id');
     }
 
+
     public function storeProduct ()
     {
         return $this->belongsToMany (
-            Product::class,
+            StoreProduct::class,
             'store_products_offers',
             'offer_id',
             'store_product_id',
