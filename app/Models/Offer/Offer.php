@@ -3,8 +3,6 @@
 namespace App\Models\Offer;
 
 use App\Models\Comment\Comment;
-use App\Models\Products\Product;
-use App\Models\Stores\Store;
 use App\Models\Stores\StoreProduct;
 use App\Scopes\OfferScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
