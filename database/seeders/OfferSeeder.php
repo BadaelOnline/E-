@@ -20,28 +20,23 @@ class OfferSeeder extends Seeder
             $s = DB::table('offers')->insertGetId([
                 'is_offer' => $faker->boolean,
                 'is_active' => $faker->boolean,
-                'store_id' => $faker->numberBetween(1, 10),
                 'user_email' => $faker->email,
-                'store_product_id' => $faker->numberBetween(1, 1000),
-                'image'=>$faker->sentence(2),
-                'position' => $faker->numberBetween(1, 10),
-                'price' => $faker->numberBetween(1000, 6000),
-                'selling_price' => $faker->numberBetween(500, 5000),
-                'quantity' => $faker->numberBetween(1, 10),
+                'offer_price' => $faker->numberBetween(1000, 6000),
+                'selling_quantity' => $faker->numberBetween(1, 10),
                 'started_at'=>$faker->dateTimeBetween('+1 week', '+1 month'),
                 'ended_at' => $faker->dateTimeBetween('+1 week', '+1 month')
 
             ]);
             DB::table('offer_translations')->insert([[
                 'name'=>$faker->sentence(2),
-                'short_description' => $faker->sentence(5),
-                'long_description' => $faker->sentence(10),
+                'short_desc' => $faker->sentence(5),
+                'long_desc' => $faker->sentence(10),
                 'offer_id' => $s,
                 'locale' => 'en',
             ],
                 ['name'=>$faker->sentence(2),
-                    'short_description' => $faker->sentence(5),
-                    'long_description' => $faker->sentence(10),
+                    'short_desc' => $faker->sentence(5),
+                    'long_desc' => $faker->sentence(10),
                     'offer_id' => $s,
                     'locale' => 'ar',
                 ]]);

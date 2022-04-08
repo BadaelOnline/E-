@@ -8,6 +8,7 @@ use App\Models\Offer\OfferTranslation;
 use App\Models\Stores\Store;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
 class OfferService
 {
@@ -22,8 +23,19 @@ class OfferService
 
     public function get (){
         try {
-            $offers = $this->OfferModel::with('storeProduct')
-                ->paginate(5);
+            $offers = $this->OfferModel::with(['storeProduct' => function ($q){
+                return $q->with(['Store'=>function($q1){
+                   return  $q1->withoutGlobalScope(StoreScope::class)
+                    ->select(['stores.id'])
+                    ->with(['StoreTranslation' => function ($q) {
+                        return $q->where('store_translations.local',
+                            '=',
+                            Config::get('app.locale'))
+                            ->select(['store_translations.name', 'store_translations.store_id'
+                            ])->get();
+                }])->get();
+                    }])->get();
+            }])->paginate(5);
             return $this->returnData ('Offer', $offers, 'Done');
         } catch (\Exception $ex) {
             return $this->returnError ($ex->getCode (), $ex->getMessage ());

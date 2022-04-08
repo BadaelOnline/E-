@@ -16,7 +16,7 @@ class Offer extends Model
     protected $fillable = ['id', 'user_email', 'offer_price', 'selling_quantity'
         , 'started_at', 'ended_at', 'is_active', 'is_offer'];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['created_at', 'updated_at','pivot'];
 
     //local scope
     public function scopeNotActive ($query)
@@ -40,16 +40,13 @@ class Offer extends Model
         return $this->hasMany (OfferTranslation::class,'offer_id');
     }
 
-
     public function storeProduct ()
     {
         return $this->belongsToMany (
             StoreProduct::class,
             'store_products_offers',
             'offer_id',
-            'store_product_id',
-            'id',
-            'id'
+            'store_product_id'
         );
     }
 
