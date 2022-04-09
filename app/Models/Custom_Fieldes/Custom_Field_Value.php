@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\Custom_Fieldes;
 use App\Models\Products\Product;
+use App\Models\Stores\StoreProductDetails;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 class Custom_Field_Value extends Model
@@ -19,5 +20,12 @@ class Custom_Field_Value extends Model
             'custom_field_value_id',
             'product_id'
         );
+    }
+
+    public function StoreProductDetails(){
+        return $this->belongsToMany(StoreProductDetails::class,
+            'details_custom_values',
+            'custom_field_value_id',
+            'store_products_details_id');
     }
 }

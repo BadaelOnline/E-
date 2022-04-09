@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Jobs\SendRequestMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,16 +11,17 @@ use Illuminate\Queue\SerializesModels;
 class SendRequest1 extends Mailable
 {
     use Queueable, SerializesModels;
-    public $details;
+
+//    protected $front;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($details)
+    public function __construct()
     {
-        $this->details=$details;
+
     }
 
     /**
@@ -29,6 +31,6 @@ class SendRequest1 extends Mailable
      */
     public function build()
     {
-        return $this->subject('test laravel 8')->view('email.sendmail');
+        return $this->view('email.sendmail');
     }
 }

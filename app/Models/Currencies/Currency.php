@@ -15,4 +15,5 @@ class Currency extends Model
         'created_at', 'updated_at'
     ];
     protected $fillable=['id','currency','code','symbol'];
+
 }

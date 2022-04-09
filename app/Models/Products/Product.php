@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 class Product extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'id';
     protected $table = 'products';
     protected $fillable = [
@@ -116,11 +117,6 @@ class Product extends Model
     public function ProductImage()
     {
         return $this->hasMany(ProductImage::class);
-    }
-
-    public function storeProducts()
-    {
-        return $this->hasMany(StoreProduct::class);
     }
 
     public function Section()
