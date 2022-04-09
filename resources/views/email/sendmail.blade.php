@@ -10,7 +10,7 @@
 <strong>Hi front end developer</strong>
 
 <p> this is request for store register</p>
-<p> {{$front}}</p>
+{{--<p> {{$front}}</p>--}}
 
 <strong>Thank you Sir. :)</strong>
 

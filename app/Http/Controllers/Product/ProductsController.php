@@ -20,11 +20,11 @@ class ProductsController extends Controller
     {
         $this->ProductService = $ProductService;
 //        $this->user = JWTAuth::parseToken()->authenticate();
-        $this->middleware('can:Read Product')->only(['getAll', 'getById', 'getTrashed']);
-        $this->middleware('can:Create Product')->only('create');
-        $this->middleware('can:Update Product')->only('update');
-        $this->middleware('can:Delete Product')->only(['trash', 'delete']);
-        $this->middleware('can:Restore Product')->only('restoreTrashed');
+//        $this->middleware('can:Read Product')->only(['getAll', 'getById', 'getTrashed']);
+//        $this->middleware('can:Create Product')->only('create');
+//        $this->middleware('can:Update Product')->only('update');
+//        $this->middleware('can:Delete Product')->only(['trash', 'delete']);
+//        $this->middleware('can:Restore Product')->only('restoreTrashed');
     }
 
     /*** this function for dashboard ***/

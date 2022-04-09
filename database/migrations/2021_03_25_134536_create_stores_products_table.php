@@ -18,8 +18,6 @@ class CreateStoresProductsTable extends Migration
             $table->id();
             $table->unsignedInteger('store_id')->index();
             $table->unsignedInteger('product_id')->index();
-            $table->unsignedInteger('price');
-            $table->unsignedInteger('quantity')->default(300);
             $table->boolean('is_active')->default(0);
             $table->boolean('is_appear')->default(0);
             $table->timestamps();
