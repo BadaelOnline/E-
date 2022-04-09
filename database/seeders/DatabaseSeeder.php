@@ -69,8 +69,9 @@ class DatabaseSeeder extends Seeder
 //            RestaurantRestauranProductSeeder::class,
 //            RestaurantManagerSeeder::class,
 //
-//            OfferSeeder::class,
-//            CommentSeeder::class,
+           OfferSeeder::class,
+           store_product_offerSeeder::class,
+        //    CommentSeeder::class,
 //            InteractionSeeder::class,
 
 

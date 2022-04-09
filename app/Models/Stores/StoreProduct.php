@@ -13,7 +13,7 @@ class StoreProduct extends Pivot
     protected $primaryKey = 'id';
     protected $hidden =
         [
-        'created_at', 'updated_at','is_active','is_appear'
+        'created_at', 'updated_at','is_active','is_appear','pivot'
         ];
     protected $casts = [
         'is_active' => 'boolean',
