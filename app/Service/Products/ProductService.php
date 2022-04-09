@@ -37,8 +37,8 @@ class ProductService
     private $PAGINATION_COUNT;
 
     public function __construct(
-        Product $product, ProductTranslation $productTranslation,
-        Category $category, Section $sectionModel, Store $storeModel,
+        Product      $product, ProductTranslation $productTranslation,
+        Category     $category, Section $sectionModel, Store $storeModel,
         StoreProduct $storeProduct, Custom_Field $CustomField
     )
     {
@@ -51,6 +51,18 @@ class ProductService
         $this->customFieldModel = $CustomField;
         $this->PAGINATION_COUNT = 25;
     }
+
+    private function fillProduct($request_arr)
+    {
+        return (
+        ['slug' => $request_arr['slug'],
+            'barcode' => $request_arr['barcode'],
+            'is_active' => $request_arr['is_active'],
+            'is_appear' => $request_arr['is_appear'],
+            'brand_id' => $request_arr['brand_id'],
+        ]);
+    }
+
 
     /*** this function for dashboard ***/
     public function dashgetAll()
@@ -158,7 +170,7 @@ class ProductService
     public function getAll()
     {
         try {
-            Gate::authorize('Read Product');
+//            Gate::authorize('Read Product');
 
             $products = $this->productModel
                 ->with(['Store', 'ProductImage'])
@@ -176,7 +188,7 @@ class ProductService
     public function getProductByCategory($id)
     {
         try {
-            Gate::authorize('Read Product');
+//            Gate::authorize('Read Product');
 
             $products = $this->categoryModel->with('Product')->find($id);
             if (is_null($products)) {
@@ -193,7 +205,7 @@ class ProductService
     public function getById($id)
     {
         try {
-            Gate::authorize('Read Product');
+//            Gate::authorize('Read Product');
 
             $product = $this->productModel
                 ->with(['Store', 'Category', 'ProductImage', 'Brand', 'StoreProduct'])
@@ -272,7 +284,7 @@ class ProductService
     {
 
         try {
-            Gate::authorize('Create Product');
+//            Gate::authorize('Create Product');
 
             $request->validated();
             $request->is_active ? $is_active = true : $is_active = false;
@@ -281,13 +293,16 @@ class ProductService
             $allproducts = collect($request->product)->all();
             DB::beginTransaction();
             /**create the default language's product**/
-            $unTransProduct_id = $this->productModel->insertGetId([
-                'slug' => $request['slug'],
-                'barcode' => $request['barcode'],
-                'is_active' => $request['is_active'],
-                'is_appear' => $request['is_appear'],
-                'brand_id' => $request['brand_id'],
-            ]);
+            $unTransProduct_id = $this->productModel->insertGetId(
+                $this->fillProduct($request)
+//
+//                'slug' => $request['slug'],
+//                'barcode' => $request['barcode'],
+//                'is_active' => $request['is_active'],
+//                'is_appear' => $request['is_appear'],
+//                'brand_id' => $request['brand_id'],
+//            ]
+            );
             //check the product and request
             if (isset($allproducts) && count($allproducts)) {
                 /**insert other traslations for products**/
@@ -323,7 +338,7 @@ class ProductService
                     $product = $this->productModel->find($unTransProduct_id);
                     $product->ProductImage()->insert([
                         'product_id' => $unTransProduct_id,
-                        'image' => $this->upload($image['image'], $unTransProduct_id, $folder),
+                        'image' => $this->uploadWithId($image['image'], $unTransProduct_id, $folder),
                         'is_cover' => $image['is_cover'],
                     ]);
                 }
@@ -483,7 +498,7 @@ class ProductService
         }
     }
 
-    public function upload($image, $id, $folder)
+    public function upload($image, $id)
     {
         $folder = public_path('images/products' . '/' . $id . '/');
         $filename = time() . '.' . $image->getClientOriginalName();

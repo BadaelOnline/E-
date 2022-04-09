@@ -27,9 +27,9 @@ class StoresProductsController extends Controller
     {
         return $this->StoresProductsService->viewStoresHasProduct($id);
     }
-    public function viewProductsInStore($id)
+    public function viewProductsInStore($store_id)
     {
-        return $this->StoresProductsService->viewProductsInStore($id);
+        return $this->StoresProductsService->viewProductsInStore($store_id);
     }
     public function hiddenProductByQuantity($id)
     {

@@ -1,5 +1,12 @@
 <?php
+/**
+ * @file
+ * Description of what this module (or file) is doing.
+ */
 
+/**
+ * Implements hook_help().
+ */
 namespace App\Service\Currencies;
 
 use App\Http\Requests\Brands\BrandRequest;
@@ -15,8 +22,8 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class CurrenciesService
 {
-    private $currency;
-    private $PAGINATION_COUNT;
+    private int $PAGINATION_COUNT;
+    private Currency $currencyModel;
 
     use GeneralTrait;
 
@@ -26,7 +33,9 @@ class CurrenciesService
         $this->PAGINATION_COUNT = 25;
     }
 
-    /****Get All Currencies  ****/
+    /* @Get All Currencies
+     * @return JsonResponse
+     */
     public function getAll()
     {
         try {

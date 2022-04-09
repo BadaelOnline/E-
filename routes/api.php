@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ActiveTime\ActiveTimeController;
 use App\Http\Controllers\Appointment\AppointmentController;
+use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Auth\PasswordResetRequestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Clinic\ClinicController;
 use App\Http\Controllers\Comment\CommentController;
@@ -36,13 +38,17 @@ Route::group(
 //        /,'role:superadministrator|administrator|user']
     ],
     function () {
+
+        Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
+        Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);
         /**__________________________ Product routes  __________________________**/
 
         Route::group(['prefix' => 'products', 'namespace' => 'Product'], function () {
-            Route::GET('/getAll', 'ProductsController@getAll')->middleware('can:Read Brand');
-            Route::GET('/getProductByCategory/{id}', 'ProductsController@getProductByCategory')->middleware('can:Read Product');
-            Route::GET('/getById/{id}', 'ProductsController@getById')->middleware('can:Read Product');
-            Route::POST('/create', 'ProductsController@create')->middleware('can:Create Product');
+            Route::GET('/getAll', 'ProductsController@getAll');
+//                ->middleware('can:Read Brand');
+            Route::GET('/getProductByCategory/{id}', 'ProductsController@getProductByCategory');
+            Route::GET('/getById/{id}', 'ProductsController@getById');
+            Route::POST('/create', 'ProductsController@create');
             Route::PUT('/update/{id}', 'ProductsController@update')->middleware('can:Update Product');
             Route::GET('/search/{title}', 'ProductsController@search')->middleware('can:Read Product');
             Route::PUT('/trash/{id}', 'ProductsController@trash')->middleware('can:Delete Product');;
@@ -72,9 +78,9 @@ Route::group(
         });
         /**__________________________ Category routes __________________________**/
         Route::group(['prefix' => 'categories', 'namespace' => 'Category'], function () {
-            Route::GET('/getAll', 'CategoriesController@getAll')->middleware('can:Read Category');
-            Route::GET('/getById/{id}', 'CategoriesController@getById')->middleware('can:Read Category');
-            Route::GET('/getCategoryBySelf/{id}', 'CategoriesController@getCategoryBySelf')->middleware('can:Read Category');
+            Route::GET('/getAll', 'CategoriesController@getAll');
+            Route::GET('/getById/{id}', 'CategoriesController@getById');
+            Route::GET('/getCategoryBySelf/{id}', 'CategoriesController@getCategoryBySelf');
             Route::POST('/create', 'CategoriesController@create')->middleware('can:Create Category');
             Route::PUT('/update/{id}', 'CategoriesController@update')->middleware('can:Update Category');
             Route::PUT('/trash/{id}', 'CategoriesController@trash')->middleware('can:Delete Category');
@@ -532,4 +538,5 @@ Route::group(
             Route::GET('/trash', 'AttachmentsController@getTrashed');
             Route::DELETE('/delete/{id}', 'AttachmentsController@delete');
         });
+
     });
