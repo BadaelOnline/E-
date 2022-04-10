@@ -431,13 +431,13 @@ Route::group(
         ################ OFFERS ROUTE ##################################
         //////////////// offers Route ////////////////////////////
         Route::group(['namespace' => 'Offer','prefix' => 'offer'], function () {
-            Route::get('/', 'OfferController@get');
-            Route::get('/{id}', 'OfferController@getById');
+            Route::get('/getAll', 'OfferController@get');
+            Route::get('/getById/{id}', 'OfferController@getById');
             Route::post('/create', 'OfferController@create');
-            Route::put('/{id}', 'OfferController@update');
+            Route::put('/update/{id}', 'OfferController@update');
             Route::PUT('/trash/{id}', 'OfferController@trash');
             Route::PUT('/restoretrashed/{id}', 'OfferController@restoreTrashed');
-            Route::delete('/{id}', 'OfferController@delete');
+            Route::delete('/delete/{id}', 'OfferController@delete');
             Route::get('/get-store/{Offer_id}', 'OfferController@getStoreByOfferId');
             Route::get('/get-offer/{store_id}', 'OfferController@getOfferByStoreId');
         });
@@ -534,5 +534,5 @@ Route::group(
             Route::GET('/trash', 'AttachmentsController@getTrashed');
             Route::DELETE('/delete/{id}', 'AttachmentsController@delete');
         });
-
+        Route::get('artisan','Commands\Command@migrateDatabase');
     });
