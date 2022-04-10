@@ -13,6 +13,7 @@ class StoreProductDetails extends Model
     protected $primaryKey = 'id';
     protected $table = 'store_product_details';
     protected $fillable = ['price', 'quantity', 'store_products_id'];
+    protected $hidden = ['created_at', 'updated_at','pivot'];
 //    protected $hidden = ;
 
     public function Custom_Field_Value()
