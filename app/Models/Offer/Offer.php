@@ -57,16 +57,15 @@ class Offer extends Model
     {
         return $query->with(['StoreProductDetails' => function ($q){
             return $q->with(['StoreProduct'=> function($q1){
-                return $q1->with(['Store'=>function($q2){
-                    return  $q2->withoutGlobalScope(StoreScope::class)
-                        ->join('store_translations', 'stores.id', '=','store_translations.store_id' )
-                        ->where('store_translations.local','=',Config::get('app.locale'))
-                        ->select([
-                            'stores.id',
-                            'stores.logo',
-                            'store_translations.name'
-                        ]);
-                }]);
+                return $q1
+                    ->join('stores', 'stores_products.store_id', '=','stores.id' )
+                    ->join('store_translations', 'stores.id', '=','store_translations.store_id' )
+                    ->where('store_translations.local','=',Config::get('app.locale'))
+                    ->select([
+                        'stores.id',
+                        'stores.logo',
+                        'store_translations.name'
+                    ]);
             }]);
         }]);
     }

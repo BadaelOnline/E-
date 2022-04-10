@@ -27,18 +27,6 @@ class OfferService
             $offers = $this->OfferModel
                 ->getStoreProductsList()
                 ->paginate(5);
-
-            //     return $q->with(['Store'=>function($q1){
-            //        return  $q1->withoutGlobalScope(StoreScope::class)
-            //         ->select(['stores.id'])
-            //         ->with(['StoreTranslation' => function ($q) {
-            //             return $q->where('store_translations.local',
-            //                 '=',
-            //                 Config::get('app.locale'))
-            //                 ->select(['store_translations.name', 'store_translations.store_id'
-            //                 ])->get();
-            //     }])->get();
-            //         }])->get();
             return $this->returnData ('Offer', $offers, 'Done');
         } catch (\Exception $ex) {
             return $this->returnError ($ex->getCode (), $ex->getMessage ());
@@ -48,7 +36,7 @@ class OfferService
     public function getById ($id){
         try {
             $offer = $this->OfferModel::find ($id)
-                ->with('storeProduct')
+                ->getStoreProductsList()
                 ->get();
             if (!$offer) {
                 return $this->returnError ('400', 'not found this offer');
