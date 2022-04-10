@@ -12,12 +12,12 @@ class Controller extends BaseController
 {
      use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-     public function sendMail()
-     {
-         $details=[
-           'title'=>'test',
-           'bode'=>'test'
-         ];
-         Mail::to('fahed8592@gmail.com',)->send(new SendRequest($details));
-     }
+//     public function sendMail()
+//     {
+//         $details=[
+//           'title'=>'test',
+//           'bode'=>'test'
+//         ];
+//         Mail::to('fahed8592@gmail.com',)->send(new SendRequest($details));
+//     }
 }

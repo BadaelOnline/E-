@@ -2,12 +2,11 @@
 
 namespace App\Service\Stores;
 
+use App\Jobs\sendRequestMail;
 use App\Models\Images\Banner;
 use App\Models\Stores\Store;
 use App\Models\Stores\StoreTranslation;
 use App\Models\User;
-use App\Notifications\StoreRegistration;
-use App\Notifications\SendRequest;
 use App\Scopes\BrandScope;
 use App\Service\Attachments\AttachmentService;
 use App\Service\SocialMedia\SocialMediaService;
@@ -16,15 +15,14 @@ use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use App\Mail\SendRequest1;
 
 
 class  StoreService
 {
     use GeneralTrait;
+
     private $storeTranslation;
     private $Store;
     private $attachmentsService;
@@ -33,11 +31,11 @@ class  StoreService
     private $subscriptionService;
     private $user;
 
-    public function __construct(Store $store, StoreTranslation $storeTranslation,
-                                Banner $banner,User $user,
-                                AttachmentService $attachmentsService,
+    public function __construct(Store                $store, StoreTranslation $storeTranslation,
+                                Banner               $banner, User $user,
+                                AttachmentService    $attachmentsService,
                                 SubscriptionsService $subscriptionService,
-                                SocialMediaService $SocialMediaService)
+                                SocialMediaService   $SocialMediaService)
     {
         $this->storeModel = $store;
         $this->storeTranslation = $storeTranslation;
@@ -59,7 +57,7 @@ class  StoreService
             'section_id' => $request_arr['section_id'],
             'is_approved' => 0,
             'is_active' => 1,
-            'logo' => $this->upload($request_arr['logo'], $logo_folder),
+            'logo' => $this->uploadImage($request_arr['logo'], $logo_folder),
         ]);
     }
 
@@ -193,16 +191,11 @@ class  StoreService
     public function create($request)
     {
         try {
-            $front=collect($request);
             /***  //transformation to collection*////
-             $admin=User::where('email','superadministrator@app.com')->findOrFail(1);
-//             $alaa='fahed9285@gmail.com';
-//            Notification::send($alaa, new SendRequest($request,$alaa));
-//            Mail::send('email.sendmail',compact('front'),
-//                function ($message){
-//                    $message->to('fahed8592@gmail.com','laravel')
-//                    ->subject('store register request');
-//                });
+            $details['email'] = 'your_email@gmail.com';
+            $job = (new SendRequestMail($details))
+                ->delay(\Carbon\Carbon::now()->addSeconds(5));
+            dispatch($job);
             $stores = collect($request->store)->all();
             $attachments = collect($request->attachments);
             $subscriptions = collect($request->subscriptions)->all();
@@ -235,7 +228,7 @@ class  StoreService
                 }
             }
             DB::commit();
-            Notification::send($admin, new StoreRegistration($admin,$unTransStore_id));
+//            Notification::send($admin, new StoreRegistration($admin,$unTransStore_id));
             return $this->returnData('Store', [$unTransStore_id, $transStore_arr], 'done');
         } catch (\Exception $ex) {
             DB::rollback();
@@ -268,7 +261,7 @@ class  StoreService
                     'section_id' => $request['section_id'],
                     'is_active' => $request['is_active'],
                     'is_approved' => 0,
-                    'logo' => $this->upload($request['logo'], $logo_folder)
+                    'logo' => $this->uploadImage($request['logo'], $logo_folder)
                 ]);
             $stores = collect($request->store)->all();
             //Stores in database
@@ -354,7 +347,7 @@ class  StoreService
     public function account($storeId)
     {
         try {
-            $store = $this->storeModel->with('Shipping_Method','Banner')->find($storeId);
+            $store = $this->storeModel->with('Shipping_Method', 'Banner')->find($storeId);
             return is_null($store) ?
                 $this->returnSuccessMessage('Store', 'This stores not found') :
                 $this->returnData('Store', $store, 'Done');
@@ -373,7 +366,7 @@ class  StoreService
             if (isset($banners) && count($banners)) {
                 foreach ($banners as $banner) {
                     $banners_arr[] = [
-                        'image' => $this->upload($banner['image'], $folder),
+                        'image' => $this->uploadImage($banner['image'], $folder),
                         'description' => $banner['description'],
                         'store_id' => $storeId,
                         'is_active' => $banner['is_active'],
@@ -394,11 +387,11 @@ class  StoreService
         try {
 //            return $request;
             $folder = public_path('images/stores/banners' . '/' . $storeId . '/');
-             $banner = $this->banner->find($bannerId);
-             $file=$banner->image;
+            $banner = $this->banner->find($bannerId);
+            $file = $banner->image;
 //            File::delete($file);
             $banner->update([
-                'image' => $this->upload($request['image'],$folder),
+                'image' => $this->uploadImage($request['image'], $folder),
                 'description' => $request['description'],
                 'is_active' => $request['is_active'],
                 'is_appear' => $request['is_appear']
@@ -421,18 +414,6 @@ class  StoreService
         }
     }
 
-    public function upload($image, $folder)
-    {
-        // $folder = public_path('images/attachments/stores' . '/' . $id . '/');
-        $filename = time() . '.' . $image->getClientOriginalName();
-        //  $imageUrl='images/attachments/stores/' . $id  . '/' .  $filename;
-        if (!File::exists($folder)) {
-            File::makeDirectory($folder, 0775, true, true);
-        }
-        $image->move($folder, $filename);
-        return $filename;
-    }
-
     public function storeUsers($storeId)
     {
         try {
@@ -445,7 +426,7 @@ class  StoreService
     public function storeUsersDelete($storeId, $userId)
     {
         try {
-            $store = $this->storemodel->find($storeId);
+            $store = $this->storeModel->find($storeId);
             $store->User()->detach($userId);
             $store_user = $store->with('User')->get();
             return $this->returnData('store_user', $store_user, 'done');
@@ -457,9 +438,9 @@ class  StoreService
 
     public function sendMail()
     {
-        $details=[
-            'title'=>'test',
-            'bode'=>'test'
+        $details = [
+            'title' => 'test',
+            'bode' => 'test'
         ];
         Mail::to('fahed8592@gmail.com',)->send(new SendRequest1($details));
     }

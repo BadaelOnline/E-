@@ -61,7 +61,7 @@ class CategoryService
     public function getAll()
     {
         try{
-            Gate::authorize('Read Category');
+//            Gate::authorize('Read Category');
 
             $category = $this->categoryModel->with(['Section','Parent'])->paginate($this->PAGINATION_COUNT);
             if (count($category) > 0){
@@ -77,7 +77,7 @@ class CategoryService
     public function getById($id)
     {
         try{
-            Gate::authorize('Read Category');
+//            Gate::authorize('Read Category');
             $category =$this->categoryModel->with(['Section','Parent'])->find($id);
             if (is_null($category) ){
                 return $this->returnSuccessMessage('This Category not found','done');
@@ -100,7 +100,7 @@ class CategoryService
     public function getTrashed()
     {
         try{
-            Gate::authorize('Read Category');
+//            Gate::authorize('Read Category');
             $category = $this->categoryModel->where('categories.is_active',0)->get();
           return $this -> returnData('Category',$category,'done');
         }catch(\Exception $ex){

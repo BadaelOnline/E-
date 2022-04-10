@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             StoreImagesSeeder::class,
             ProductsSeeder::class,
             StoreSeeder::class,
+            StoreProductsDetails::class,
 //            StoreImagesSeeder::class,
 //
 //
