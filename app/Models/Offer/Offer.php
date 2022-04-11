@@ -3,10 +3,13 @@
 namespace App\Models\Offer;
 
 use App\Models\Comment\Comment;
-use App\Models\Stores\StoreProduct;
+use App\Models\Stores\StoreProductDetails;
 use App\Scopes\OfferScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
+use App\Scopes\StoreScope;
+
 
 class Offer extends Model
 {
@@ -40,14 +43,31 @@ class Offer extends Model
         return $this->hasMany (OfferTranslation::class,'offer_id');
     }
 
-    public function storeProduct ()
+    public function StoreProductDetails ()
     {
         return $this->belongsToMany (
-            StoreProduct::class,
+            StoreProductDetails::class,
             'store_products_offers',
             'offer_id',
             'store_product_id'
         );
+    }
+
+    public function scopeGetStoreProductsList ($query)
+    {
+        return $query->with(['StoreProductDetails' => function ($q){
+            return $q->with(['StoreProduct'=> function($q1){
+                return $q1
+                    ->join('stores', 'stores_products.store_id', '=','stores.id' )
+                    ->join('store_translations', 'stores.id', '=','store_translations.store_id' )
+                    ->where('store_translations.local','=',Config::get('app.locale'))
+                    ->select([
+                        'stores.id',
+                        'stores.logo',
+                        'store_translations.name'
+                    ]);
+            }]);
+        }]);
     }
 
     public function Comment()
