@@ -75,7 +75,7 @@ class OfferService
              }
             if ($request->has('storeProduct')) {
                 $store_product = $this->OfferModel->find($unTransOffer_Id);
-                $store_product->storeProduct()->syncWithoutDetaching($request->get('storeProduct'));
+                $store_product->StoreProductDetails()->syncWithoutDetaching($request->get('storeProduct'));
             }
             DB::commit ();
             return $this->returnData ('offer', [$unTransOffer_Id, $transOffer_arr], 'done');
@@ -126,7 +126,7 @@ class OfferService
           }
           if ($request->has('storeProduct')) {
               $store_product = $this->OfferModel->find($unTransOffer_Id);
-              $store_product->storeProduct()->syncWithoutDetaching($request->get('storeProduct'));
+              $store_product->StoreProductDetails()->syncWithoutDetaching($request->get('storeProduct'));
           }
           DB::commit ();
           return $this->returnData ('offer', [$offers], 'done');
