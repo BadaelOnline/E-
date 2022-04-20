@@ -34,53 +34,52 @@ class AuthController extends Controller
         $this->authService=$authService;
         $this->roleModel=$roleModel;
         $this->userTranslation=$userTranslation;
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        // $this->middleware('auth:api', ['except' => ['login','register']]);
+        // $this->middleware('auth:api', ['except' => ['login','register']]);
 //        $this->middleware('guest');
 
     }
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return JsonResponse
-     */
+
+     public function indexLogin(){
+        return view('layouts.authentication.login');
+     }
+
+     public function indexRegister(){
+        return view('layouts.authentication.register');
+     }
+
     public function login(Request $request)
     {
         return $this->authService->login( $request);
     }
-    /**
-     * Get the authenticated User.
-     *
-     * @return JsonResponse
-     */
-    public function me()
+    
+    public function register(Request $request)
     {
-        return $this->authService->me();
+        return $this->authService->register($request);
     }
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return JsonResponse
-     */
+
     public function logout(Request $request)
     {
         return $this->authService->logout($request);
 
     }
-    /**
-     * Refresh a token.
-     *
-     * @return JsonResponse
-     */
+
+    public function profile()
+    {
+        return $this->authService->profile();
+    }
+
     public function refresh()
     {
         return $this->authService->refresh();
     }
-    public function register(Request $request)
-    {
-        return $this->authService->register($request);
-    }
+    
     public function get_user(Request $request)
     {
         return $this->authService->get_user($request);
+    }
+
+    public function get_dashboard(){
+        return view('layouts.admin');
     }
 }
