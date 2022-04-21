@@ -12,6 +12,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthService
 {
@@ -34,13 +36,31 @@ class AuthService
         $this->userTranslation = $userTranslation;
     }
 
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return JsonResponse
-     */
+
+    public function indexLogin(){
+
+    }
+
+    public function indexRegister(){
+
+    }
+
     public function login(Request $request)
     {
+        try {
+            $token_validity = 24 * 60;
+            $this->guard()->factory()->setTTL($token_validity);
+            $credentials = $request->only('email', 'password');
+            if (! $token = $this->guard()->attempt($credentials)){
+                return redirect()->route('index.login')->with('error', 'Unauthorized');
+            }
+            $cookie = cookie('jwt',$token,$token_validity);
+            return redirect()->route('admin.dashboard')->with('success', 'Login successfully');
+        } catch (\Exception $ex) {
+            return redirect()->route('index.login')->with('error', 'faild login');
+        }
+
+        /*
         try {
             $credentials = $request->only('email', 'password');
             $token = auth('user-api')->attempt($credentials);
@@ -61,51 +81,31 @@ class AuthService
                 return $this->returnError('401', 'this email in used');
             }
         }
-    }
-
-    /**
-     * Get the authenticated User.
-     *
-     * @return JsonResponse
-     */
-    public function me()
-    {
-        return response()->json(auth('user-api')->user());
-    }
-
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return JsonResponse
-     */
-    public function logout(Request $request)
-    {
-        $token = $request->token;
-        if ($token) {
-            try {
-
-                auth('user-api')->setToken($token)->invalidate(); //logout
-            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-                return $this->returnError('', 'some thing went wrongs' . $e->getMessage());
-            }
-            return $this->returnSuccessMessage('Logged out successfully', '200');
-        } else {
-            $this->returnError('', 'some thing went wrongs');
-        }
-    }
-
-    /**
-     * Refresh a token.
-     *
-     * @return JsonResponse
-     */
-    public function refresh()
-    {
-        return $this->respondWithToken(auth('user-api')->refresh());
+        */
     }
 
     public function register(Request $request)
     {
+        try{
+        $user = $this->userModel->create([
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'username' => $request->input('username'),
+            'age' => $request->input('age'),
+            'location_id' => $request->input('location_id'),
+            'social_media_id' => $request->input('social_media_id'),
+            'is_active' => $request->is_active = 1,
+            'image' => $request->input('image'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password'))
+        ]);
+        $token = JWTAuth::fromUser($user);
+        return redirect()->route('index.login')->with('success', 'Registered successfully');
+    } catch (\Exception $ex) {
+        return $ex->getMessage();
+        return redirect()->route('index.register')->with('error', 'faild login');
+        }
+        /*
         $user = $this->userModel->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -120,7 +120,50 @@ class AuthService
         ]);
         $token = JWTAuth::fromUser($user);
         return $this->respondWithToken($token);
+        */
     }
+
+    public function logout(Request $request)
+    {
+        try {
+            Cookie::forget('jwt');
+            // $this->guard()->logout();
+            return redirect()->route('index.login')->with('success', 'Logged out successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')->with('error', 'some thing went wrongs');
+        }
+        /*
+         $token = $request->token;
+        if ($token) {
+            try {
+
+                auth('user-api')->setToken($token)->invalidate(); //logout
+            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+                return $this->returnError('', 'some thing went wrongs' . $e->getMessage());
+            }
+            return $this->returnSuccessMessage('Logged out successfully', '200');
+        } else {
+            $this->returnError('', 'some thing went wrongs');
+        }
+        */
+    }
+
+    public function profile()
+    {
+        return $this->guard()->user();
+        // return response()->json(auth('user-api')->user());
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken($this->guard()->refresh());
+        // return $this->respondWithToken(auth('user-api')->refresh());
+    }
+
+    protected function guard(){
+        return Auth::guard();
+    }
+
 
     public function get_user(Request $request)
     {
@@ -128,22 +171,31 @@ class AuthService
         $user = JWTAuth::authenticate($request->token);
 
         return response()->json(['User' => $user]);
+        /*
+         $user = JWTAuth::authenticate($request->token);
+
+        return response()->json(['User' => $user]);
+        */
     }
 
-    /**
-     * Get the token array structure.
-     *
-     * @param string $token
-     *
-     * @return JsonResponse
-     */
     protected function respondWithToken($token)
     {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'token_validity' => $this->guard()->factory()->getTTL() * 60,
+        ]);
+        /*
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('user-api')->factory()->getTTL() * 60,
             'user' => auth('user-api')->user()
         ]);
+        */
+    }
+
+    public function get_dashboard(){
+
     }
 }
