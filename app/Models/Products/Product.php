@@ -29,7 +29,7 @@ class Product extends Model
         'barcode', 'brand_id', 'is_appear', 'is_active'
     ];
     protected $hidden = [
-        'created_at', 'updated_at', 'category_id', 'brand_id'
+        'created_at', 'updated_at', 'category_id', 'brand_id' , 'pivot'
     ];
     protected $casts = [
         'is_active' => 'boolean',
@@ -83,18 +83,18 @@ class Product extends Model
         return $this->hasMany(ProductTranslation::class, 'product_id');
     }
 
-    public function Store()
-    {
-        return $this->belongsToMany(
-            Store::class,
-            'stores_products',
-            'product_id',
-            'store_id',
-            'id',
-            'id')
-            ->WithPivot(['price', 'quantity'])
-            ->withTimestamps();
-    }
+//    public function Store()
+//    {
+//        return $this->belongsToMany(
+//            Store::class,
+//            'stores_products',
+//            'product_id',
+//            'store_id',
+//            'id',
+//            'id')
+//            ->WithPivot(['price', 'quantity'])
+//            ->withTimestamps();
+//    }
 
     public function Category()
     {
