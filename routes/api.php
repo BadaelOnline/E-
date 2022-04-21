@@ -157,11 +157,12 @@ Route::group(
             Route::GET('/users/get/{storeId}', 'StoreController@storeUsers');
             Route::GET('/users/delete/{storeId}/{userId}', 'StoreController@storeUsersDelete');
 
-            Route::POST('/insertProductToStore', 'StoresProductsController@insertProductToStore');
-            Route::PUT('/updateProductInStore/{id}', 'StoresProductsController@updateProductInStore');
+            Route::POST('/insertProductToStore/{store_id}', 'StoresProductsController@insertProductToStore');
+            Route::PUT('/updateProductInStore/{store_id}/{product_id}', 'StoresProductsController@updateProductInStore');
             Route::PUT('/hiddenProductByQuantity/{id}', 'StoresProductsController@hiddenProductByQuantity');
             Route::GET('/viewStoresHasProduct/{id}', 'StoresProductsController@viewStoresHasProduct');
             Route::GET('/viewProductsInStore/{id}', 'StoresProductsController@viewProductsInStore');
+            Route::GET('/product-details/{product_id}', 'StoresProductsController@viewProductsDetailsInStore');
             Route::GET('/rangeOfPrice/{id}', 'StoresProductsController@rangeOfPrice');
             Route::PUT('/prices/{store_id}', 'StoresProductsController@updateMultyProductsPricesInStore');
             Route::PUT('/ratio/{store_id}', 'StoresProductsController@updatePricesPyRatio');
@@ -430,7 +431,7 @@ Route::group(
         Route::Post('upload', 'TestController@store');
         ################ OFFERS ROUTE ##################################
         //////////////// offers Route ////////////////////////////
-        Route::group(['namespace' => 'Offer','prefix' => 'offer'], function () {
+        Route::group(['namespace' => 'Offer', 'prefix' => 'offer'], function () {
             Route::get('/getAll', 'OfferController@get');
             Route::get('/getById/{id}', 'OfferController@getById');
             Route::post('/create', 'OfferController@create');
@@ -441,8 +442,8 @@ Route::group(
             Route::get('/get-store/{Offer_id}', 'OfferController@getStoreByOfferId');
             Route::get('/get-offer/{store_id}', 'OfferController@getOfferByStoreId');
         });
-        Route::get('offers/gettrashed', [OfferController::class,'getTrashed']);
-        Route::get('/get-advertisement', [OfferController::class,'getAdvertisement']);
+        Route::get('offers/gettrashed', [OfferController::class, 'getTrashed']);
+        Route::get('/get-advertisement', [OfferController::class, 'getAdvertisement']);
 
         //////////////// Comment  Route ////////////////////////////
         Route::group(['namespace' => 'Comment'], function () {
@@ -534,5 +535,5 @@ Route::group(
             Route::GET('/trash', 'AttachmentsController@getTrashed');
             Route::DELETE('/delete/{id}', 'AttachmentsController@delete');
         });
-        Route::get('artisan','Commands\Command@migrateDatabase');
+        Route::get('artisan', 'Commands\Command@migrateDatabase');
     });

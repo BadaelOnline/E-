@@ -63,18 +63,18 @@ class Store extends Model
             'store_id');
     }
 
-    public function Product()
-    {
-        return $this->belongsToMany(
-            Product::class,
-            'stores_products',
-            'store_id',
-            'product_id',
-            'id',
-            'id')
-            ->withPivot(['price', 'quantity'])
-            ->withTimestamps();
-    }
+//    public function Product()
+//    {
+//        return $this->belongsToMany(
+//            Product::class,
+//            'stores_products',
+//            'store_id',
+//            'product_id',
+//            'id',
+//            'id')
+//            ->withPivot(['price', 'quantity'])
+//            ->withTimestamps();
+//    }
 
     public function Section()
     {

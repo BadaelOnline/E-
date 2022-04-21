@@ -5,26 +5,28 @@ namespace App\Service\Stores;
 use App\Models\Stores\Store;
 use App\Models\Products\Product;
 use App\Models\Stores\StoreProduct;
-use App\Scopes\ProductScope;
-use App\Scopes\SectionScope;
+use App\Models\Stores\StoreProductDetails;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class StoresProductsService
 {
     use GeneralTrait;
 
-    private $StoresProductsService;
     private $storeProductModel;
     private $productModel;
     private $storeModel;
+    private $details;
 
-    public function __construct(StoreProduct $storeProduct, Product $product, Store $store)
+    public function __construct(StoreProduct        $storeProductModel,
+                                Product             $product, Store $store,
+                                StoreProductDetails $details)
     {
-        $this->storeProductModel = $storeProduct;
+        $this->storeProductModel = $storeProductModel;
         $this->productModel = $product;
         $this->storeModel = $store;
+        $this->details = $details;
     }
 
     /*__________________________________________________________________*/
@@ -33,9 +35,9 @@ class StoresProductsService
         try {
             $product = $this->productModel->with('Store')->find($id);
             if (is_null($product)) {
-                return $response = $this->returnSuccessMessage('This Product not found', 'done');
+                return $this->returnSuccessMessage('This Product not found', 'done');
             } else {
-                return $response = $this->returnData('Product in Store', $product, 'done');
+                return $this->returnData('Product in Store', $product, 'done');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
@@ -50,6 +52,20 @@ class StoresProductsService
             ->getStoreProductsList()
             ->get();
         if (count($product) > 0) {
+            return $this->returnData('Product in Store', $product, 'done');
+        } else {
+            return $this->returnSuccessMessage('This Product not found', 'done');
+        }
+    }
+
+    /*__________________________________________________________________*/
+    public function viewProductsDetailsInStore($product_id)
+    {
+        $product = $this->productModel
+            ->with(['Custom_Field_Value' => function ($q) {
+                return $q->with('Custom_field')->get();
+            }])->find($product_id);
+        if (!is_null($product)) {
             return $this->returnData('Product in Store', $product, 'done');
         } else {
             return $this->returnSuccessMessage('This Product not found', 'done');
@@ -77,45 +93,71 @@ class StoresProductsService
     }
 
     /*__________________________________________________________________*/
-    public function insertProductToStore(Request $request)
+    public function insertProductToStore(Request $request, $store_id)
     {
         try {
-            $request->is_active ? $is_active = true : $is_active = false;
-            $request->is_appear ? $is_appear = true : $is_appear = false;
-            $Products = collect($request->Product)->all();
-            $store = $this->storeModel->find($request->store_id);
-            $storeProduct = new StoreProduct();
-            $storeProduct->store_id = $request->store_id;
-            $storeProduct->Product_id = $request->Product_id;
-            $storeProduct->price = $request->price;
-            $storeProduct->quantity = $request->quantity;
-            $storeProduct->is_active = $request->is_active;
-            $storeProduct->is_appear = $request->is_appear;
-            $storeProduct->save();
-            return $this->returnData('Product in Store', $storeProduct, 'done');
+            $Products = collect($request->products)->all();
+            DB::beginTransaction();
+            foreach ($Products as $product) {
+                $store_products_id = $this->storeProductModel->insertGetId([
+                    'store_id' => $store_id,
+                    'product_id' => $product['id'],
+                ]);
+                $store_products_details_ids[] = $this->details->insertGetId([
+                    'price' => $product['price'],
+                    'quantity' => $product['quantity'],
+                    'store_products_id' => $store_products_id,
+                ]);
+                foreach ($store_products_details_ids as $store_products_details_id) {
+                    if (isset($product['Custom_Field_Value'])) {
+                        $details = $this->details->find($store_products_details_id);
+                        $details->Custom_Field_Value()->syncWithoutDetaching($product['Custom_Field_Value']);
+                    }
+                }
+            }
+            DB::commit();
+            return $this->returnData('Product in Store', $Products, 'done');
         } catch (\Exception $ex) {
-            return $this->returnError('400', $ex->getMessage());
+            DB::rollBack();
+            return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
         }
     }
+
     /*__________________________________________________________________*/
-//request
-//{
-//"store_id": 2,
-//"Product_id": 1,
-//"price": "651",
-//"quantity": "5450"
-//}
-    /*__________________________________________________________________*/
-    public function updateProductInStore(Request $request, $id)
+    public function updateProductInStore(Request $request, $store_id, $product_id)
     {
-        $Products = collect($request->Product)->all();
-        $storeProduct = $this->storeProductModel->where('Product_id', $id)->update([
-            'store_id' => $request->Product_id,
-            'Product_id' => $request->Product_id,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
-        ]);
-        return $response = $this->returnData('Product in Store', $storeProduct, 'done');
+        try {
+            DB::beginTransaction();
+            $store_products = StoreProduct::
+            with(['Product', 'StoreProductDetails'])
+                ->where('product_id', $product_id)
+                ->where('store_id', $store_id)
+                ->first();
+            $details_new_value = collect($request->store_product_details)->first();
+            $this->updateProductDetailsInStore(
+                $details_new_value['price'],
+                $details_new_value['quantity'],
+                $details_new_value['id']
+            );
+            DB::commit();
+            return $this->returnData('New Product in Store', $details_new_value, 'done');
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
+        }
+    }
+
+    protected function updateProductDetailsInStore($price, $quantity, $detailsId)
+    {
+        try {
+            $details = StoreProductDetails::find($detailsId);
+            $newDetails = $details->update([
+                'price' => $price,
+                'quantity' => $quantity
+            ]);
+        } catch (\Exception $ex) {
+            return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
+        }
     }
 
     /*__________________________________________________________________*/

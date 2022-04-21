@@ -16,8 +16,8 @@ class CreateStoresProductsTable extends Migration
     {
         Schema::create('stores_products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('store_id')->index();
-            $table->unsignedInteger('product_id')->index();
+            $table->unsignedInteger('store_id');
+            $table->unsignedInteger('product_id');
             $table->boolean('is_active')->default(0);
             $table->boolean('is_appear')->default(0);
             $table->timestamps();

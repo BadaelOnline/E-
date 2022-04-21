@@ -92,6 +92,8 @@ class DatabaseSeeder extends Seeder
             StoreUserSeeder::class,
             StorePaymentSeeder::class,
             LocationSeeder::class,
+            DetailsCustomValue::class,
+            StoreProductsDetails::class
         ]);
 
     }

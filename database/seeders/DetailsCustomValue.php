@@ -16,11 +16,11 @@ class DetailsCustomValue extends Seeder
     public function run()
     {
         $faker=Faker::create();
-        for ($i = 1; $i <= 5; $i++) {
-            for ($k = 1; $k <= 5; $k++) {
-                DB::table('details_custom_values')->insertGetId([
-                    'store_products_details_id' => $i,
-                    'custom_field_value_id' => $k,
+        for ($j = 1; $j <= 5; $j++) {
+            for ($i = 1; $i <= 5; $i++) {
+                $s = DB::table('details_custom_values')->insert([
+                    'store_products_details_id' => $j,
+                    'custom_field_value_id' => $i,
                 ]);
             }
         }

@@ -5,28 +5,24 @@ namespace App\Models\Stores;
 use App\Models\Products\Product;
 use App\Scopes\ProductScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 
-class StoreProduct extends Pivot
+class StoreProduct extends Model
 {
     use HasFactory;
 
     protected $table = 'stores_products';
     protected $primaryKey = 'id';
-   protected $hidden =
-        [
-        'created_at', 'updated_at','is_active','is_appear','pivot'
-        ];
-
+    protected $hidden = [
+        'created_at', 'updated_at', 'pivot'
+    ];
     protected $casts = [
         'is_active' => 'boolean',
         'is_appear' => 'boolean'
     ];
     protected $fillable = [
-        'price', 'quantity', 'is_active', 'is_approve', 'store_id', 'product_id'
+        'is_active', 'is_approve', 'store_id', 'product_id','created_at', 'updated_at',
     ];
 
     public function scopeGetStoreProductsList($q)
