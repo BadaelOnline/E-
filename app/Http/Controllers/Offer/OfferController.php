@@ -15,6 +15,9 @@ class OfferController extends Controller
     {
         $this->OfferService=$OfferService;
     }
+    public function index(){
+        return $this->OfferService->index();
+    }
     public function get()
     {
         return $this->OfferService->get();

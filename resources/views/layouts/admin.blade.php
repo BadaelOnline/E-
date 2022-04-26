@@ -81,7 +81,7 @@
         <div id="collapsePages1" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <a class="collapse-item">Products</a>
-            <a class="collapse-item">Offers</a>
+            <a class="collapse-item" href="{{route('offers.index')}}">Offers</a>
             <a class="collapse-item">Categories</a>
             <a class="collapse-item">Brands</a>
             <a class="collapse-item">Section</a>
@@ -234,6 +234,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
   <script src="{{ asset('admin/js/summernote-image-title.js') }}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
   <script>
     $(document).ready(function() {
