@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Offer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Offer\OfferRequest;
 use App\Service\Offer\OfferService;
-use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
@@ -13,7 +12,11 @@ class OfferController extends Controller
 
     public function __construct(OfferService $OfferService)
     {
-        $this->OfferService=$OfferService;
+        $this->OfferService = $OfferService;
+    }
+    public function index()
+    {
+        return $this->OfferService->index();
     }
     public function get()
     {
@@ -24,13 +27,24 @@ class OfferController extends Controller
         return $this->OfferService->getById($id);
     }
 
-    public function create(OfferRequest $request)
+    public function create()
     {
-      return $this->OfferService->create($request);
+        return $this->OfferService->create();
     }
-    public function update(OfferRequest $request,$id)
+
+    public function store(OfferRequest $request)
     {
-       return $this->OfferService->update($request,$id);
+        return $this->OfferService->store($request);
+    }
+
+    public function edit()
+    {
+        return $this->OfferService->edit();
+    }
+
+    public function update(OfferRequest $request, $id)
+    {
+        return $this->OfferService->update($request, $id);
     }
 
     public function Trash($id)
@@ -51,7 +65,7 @@ class OfferController extends Controller
     {
         return $this->OfferService->getStoreByOfferId($Offer_id);
     }
-    public  function getOfferByStoreId($Store_id)
+    public function getOfferByStoreId($Store_id)
     {
         return $this->OfferService->getOfferByStoreId($Store_id);
     }
@@ -66,4 +80,3 @@ class OfferController extends Controller
         return $this->OfferService->getTrashed();
     }
 }
-
