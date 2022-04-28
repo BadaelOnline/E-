@@ -434,7 +434,7 @@ Route::group(
         Route::group(['namespace' => 'Offer', 'prefix' => 'offer'], function () {
             Route::get('/getAll', 'OfferController@get');
             Route::get('/getById/{id}', 'OfferController@getById');
-            Route::post('/create', 'OfferController@create');
+            Route::post('/create', 'OfferController@store');
             Route::put('/update/{id}', 'OfferController@update');
             Route::PUT('/trash/{id}', 'OfferController@trash');
             Route::PUT('/restoretrashed/{id}', 'OfferController@restoreTrashed');

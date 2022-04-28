@@ -26,7 +26,12 @@ Route::prefix('admin')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('auth.register');
 
     Route::get('dashboard', [AuthController::class, 'get_dashboard'])->name('admin.dashboard');
-    Route::get('offers', [OfferController::class, 'index'])->name('offers.index');
+    Route::group(['namespace' => 'Offer', 'prefix' => 'offers'], function () {
+        Route::get('/', 'OfferController@index')->name('offers.index');
+        Route::get('/getAll', 'OfferController@get')->name('offers.getAll');
+        Route::get('/create', 'OfferController@create')->name('offers.create');
+        Route::post('/store', 'OfferController@store')->name('offers.store');
+    });
     Route::get('stores', function (Request $request) {
         return view('admin.stores.index');
     })->name('stores.list');

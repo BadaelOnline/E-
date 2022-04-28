@@ -8,6 +8,7 @@ use App\Models\Offer\OfferTranslation;
 use App\Models\Stores\Store;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
+use DataTables;
 
 class OfferService
 {
@@ -31,6 +32,9 @@ class OfferService
             $offers = $this->OfferModel
                 ->getStoreProductsList()
                 ->paginate(5);
+            // return response()->json([
+            //     'offers' => $offers
+            // ]);
             return $this->returnData('Offer', $offers, 'Done');
         } catch (\Exception $ex) {
             return $this->returnError($ex->getCode(), $ex->getMessage());
@@ -53,7 +57,11 @@ class OfferService
         }
     }
 
-    public function create($request)
+    public function create(){
+        return view('admin.offers.create');
+    }
+    
+    public function store($request)
     {
         try {
             $offers = collect($request->Offer)->all();
@@ -91,6 +99,9 @@ class OfferService
             DB::rollBack();
             return $this->returnError($ex->getCode(), $ex->getMessage());
         }
+    }
+
+    public function edit(){
     }
 
     public function update(OfferRequest $request, $id)

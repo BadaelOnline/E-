@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -26,6 +27,8 @@
 
      {{-- Select2 Style CDN --}}
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- datatables --}}
+  <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet"/>
 
   @yield('styles')
 
@@ -218,48 +221,18 @@
   <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
   <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
 
+  {{-- datatables --}}
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
   {{-- Select2 JS --}}
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-
-  <script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            placeholder: "Choose Some Tags"
-        });
-    });
-    $(function(){
-      $('.selectpicker').selectpicker();
-    });
-  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
   <script src="{{ asset('admin/js/summernote-image-title.js') }}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-
-  <script>
-    $(document).ready(function() {
-    $('#summernote').summernote({
-      fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Poppins'],
-    fontNamesIgnoreCheck: ['Poppins'],
-        imageTitle: {
-          specificAltField: true,
-        },
-        lang: 'en-US',
-        popover: {
-            image: [
-                ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-                ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                ['remove', ['removeMedia']],
-                ['custom', ['imageTitle']],
-            ],
-        },
-    });
-  });
-  </script>
-
-
-  @stack('scripts')
+  @yield('scripts')
 
 </body>
 
