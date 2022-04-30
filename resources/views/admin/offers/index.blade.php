@@ -44,7 +44,7 @@
                 url:"offers/getAll",
                 dataType:"json",
                 success: function(res){
-                    console.log(res.Offer.data);
+                    console.log('offers',res.Offer.data);
                     $('tbody').html("");
                     $.each(res.Offer.data , function(key,item){
                         $('tbody').append(

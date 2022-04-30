@@ -104,6 +104,10 @@ class  StoreService
     }
     /****________________   client side functions ________________****/
     /****________________ Get All Active Store Or By ID  ________________****/
+    public function index(){
+        return view('admin.stores.index');
+    }
+    
     public function getAll()
     {
         try {
@@ -188,7 +192,11 @@ class  StoreService
     }
 
     /****________________  Create Store   ________________****/
-    public function create($request)
+    public function create(){
+        return view('admin.stores.create');
+    }
+    
+    public function store($request)
     {
         try {
             /***  //transformation to collection*////
@@ -237,6 +245,10 @@ class  StoreService
     }
 
     /****__________________  Update Store   ___________________****/
+    public function edit(){
+        return view('admin.stores.edit');
+    }
+    
     public function update(Request $request, $id)
     {
         try {
