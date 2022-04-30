@@ -32,7 +32,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/create', 'OfferController@create')->name('offers.create');
         Route::post('/store', 'OfferController@store')->name('offers.store');
     });
-    Route::get('stores', function (Request $request) {
-        return view('admin.stores.index');
-    })->name('stores.list');
+    Route::group(['namespace' => 'Store', 'prefix' => 'stores'], function () {
+        Route::get('/', 'StoreController@index')->name('stores.index');
+        Route::get('/getAll', 'StoreController@getAll')->name('stores.getAll');
+        Route::get('/create', 'StoreController@create')->name('stores.create');
+        Route::post('/store', 'StoreController@store')->name('stores.store');
+        Route::get('/edit', 'StoreController@edit')->name('stores.edit');
+        Route::put('/update', 'StoreController@update')->name('stores.update');
+
+    });
 });

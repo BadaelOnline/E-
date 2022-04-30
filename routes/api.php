@@ -142,7 +142,7 @@ Route::group(
         Route::group(['prefix' => 'stores', 'namespace' => 'Store'], function () {
             Route::GET('/getAll', 'StoreController@getAll');
             Route::GET('/getById/{id}', 'StoreController@getById');
-            Route::POST('/create', 'StoreController@create');
+            Route::POST('/create', 'StoreController@store');
             Route::PUT('/update/{id}', 'StoreController@update');
             Route::PUT('/trash/{id}', 'StoreController@trash');
             Route::PUT('/restoreTrashed/{id}', 'StoreController@restoreTrashed');

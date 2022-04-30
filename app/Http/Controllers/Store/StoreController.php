@@ -33,6 +33,10 @@ class StoreController extends Controller
     }
     /****____________________________________________________****/
     /****________________   client side functions ________________****/
+    public function index(){
+        return $this->StoreService->index();
+    }
+    
     public function getAll()
     {
         return $this->StoreService->getAll();
@@ -48,11 +52,20 @@ class StoreController extends Controller
         return $this->StoreService->getTrashed();
     }
 
-    public function create(Request $request)
+    public function create(){
+        return $this->StoreService->create();
+
+    }
+    
+    public function store(Request $request)
     {
-        return $this->StoreService->create($request);
+        return $this->StoreService->store($request);
     }
 
+    public function edit(){
+        return $this->StoreService->edit();
+    }
+    
     public function update(Request $request, $id)
     {
         return $this->StoreService->update($request, $id);
