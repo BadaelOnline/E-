@@ -165,7 +165,6 @@ return [
         'Tymon\JWTAuth\Providers\LaravelServiceProvider',
 
         // 
-            Yajra\DataTables\DataTablesServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -234,7 +233,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
 
         'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
