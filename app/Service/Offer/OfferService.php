@@ -8,7 +8,7 @@ use App\Models\Offer\OfferTranslation;
 use App\Models\Stores\Store;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
-use DataTables;
+use App\Models\Stores\StoreProduct;
 
 class OfferService
 {
@@ -57,8 +57,10 @@ class OfferService
         }
     }
 
-    public function create(){
-        return view('admin.offers.create');
+    public function create(){ 
+        $storeProducts = StoreProduct::with('Product')->get();
+        // return $storeProducts;
+        return view('admin.offers.create',compact('storeProducts'));
     }
     
     public function store($request)
@@ -97,7 +99,8 @@ class OfferService
             //            return $this->returnData ('email', $eamil, 'An email has been sent to you');
         } catch (\Exception $ex) {
             DB::rollBack();
-            return $this->returnError($ex->getCode(), $ex->getMessage());
+            return $ex->getMessage();
+            // return $this->returnError($ex->getCode(), $ex->getMessage());
         }
     }
 

@@ -8,7 +8,7 @@
         </div>
     @endif
 
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('offers.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group m-4">
             <h2>Create Offer</h2>
@@ -151,11 +151,11 @@
             <div class="form-group ml-4">
                 <label for="storeProduct" class="col-sm-2 col-form-label">Products</label>
                 <div class="col-sm-7">
-                    <select name='storeProduct[]' class="form-control {{$errors->first('storeProduct') ? "is-invalid" : "" }} select2" id="storeProduct" multiple>
+                    <select name='storeProduct[]' class="form-control {{$errors->first('storeProduct') ? "is-invalid" : "" }} select2" id="storeProduct">
                         <option disabled selected>Choose one or more</option>
-                        {{-- @foreach ($permissions as $permission)
-                            <option value="{{ $permission->id }}">{{ $permission->name }}</option>
-                        @endforeach --}}
+                        @foreach ($storeProducts as $storeProduct)
+                            <option class="storeProduct" value="{{ $storeProduct->id }}">{{ $storeProduct->product->name }}</option>
+                        @endforeach
                     </select>
                     <div class="invalid-feedback">
                         {{ $errors->first('storeProduct') }}
@@ -182,30 +182,45 @@
                 "Offer":[
                     {
                         "name": $('.en_name').val(),
-                        "short_desc":"It is a German cream that differs from moisturizing skin creams",
-                        "long_desc":"It is a German cream that differs from skin moisturizing creams, which are always light and must be applied more than once a day to obtain an appropriate result",
+                        "short_desc":$('.en_short_desc').val(),
+                        "long_desc":$('.en_long_desc').val(),
                         "locale":"en"
                     },
                     {
                         "name": $('.ar_name').val(),
-                        "short_desc":"هو كريم ألماني يختلف عن كريمات ترطيب البشرة",
-                        "long_desc":"هو كريم ألماني يختلف عن كريمات ترطيب البشرة التي دائما ما تكون خفيفة ويجب تطبيقها أكثر من مرة يوميا للحصول على نتيجة مناسبة",
+                        "short_desc":$('.ar_short_desc').val(),
+                        "long_desc":$('.ar_long_desc').val(),
                         "locale":"ar"
                     }
                 ],
                 "storeProduct":[
                     {
-                        "store_product_id" : 3
+                        "store_product_id" : $('.storeProduct').val()
                     }
                 ],
-                "user_email":"superadministrator@app.com",
-                "offer_price":"5000",
-                "selling_quantity":"2",
-                "started_at":"2022-04-8 05:10:25",
-                "ended_at":"2022-04-12 05:10:28",
+                "user_email":$('.user_email').val(),
+                "offer_price":$('.offer_price').val(),
+                "selling_quantity":$('.selling_quantity').val(),
+                "started_at":$('.started_at').val(),
+                "ended_at":$('.ended_at').val(),
                 "is_active":"1",
                 "is_offer":"1"
             }
+            console.log(data);
+            // $.ajaxSetup({
+            //     headers:{
+            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     }
+            // });
+            $.ajax({
+                type:"GET",
+                url:"/store",
+                data:data,
+                dataType:"json",
+                success: function(res){
+                    console.log(res);
+                }
+            });
         });
     });
  

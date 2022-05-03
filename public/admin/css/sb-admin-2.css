@@ -3377,7 +3377,12 @@ input[type="button"].btn-block {
     margin-top: 0;
     margin-left: 0.125rem;
 }
-
+select.form-control[multiple],select.form-control[size]{
+    height:auto
+}
+.custom-select[multiple],.custom-select[size]:not([size="1"]){
+    height:auto;padding-right:.75rem;background-image:none
+}
 .dropright .dropdown-toggle::after {
     display: inline-block;
     margin-left: 0.255em;
