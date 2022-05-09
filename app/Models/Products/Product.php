@@ -29,7 +29,7 @@ class Product extends Model
         'barcode', 'brand_id', 'is_appear', 'is_active'
     ];
     protected $hidden = [
-        'created_at', 'updated_at', 'category_id', 'brand_id' , 'pivot'
+        'created_at', 'updated_at', 'category_id', 'brand_id', 'pivot'
     ];
     protected $casts = [
         'is_active' => 'boolean',
@@ -75,6 +75,29 @@ class Product extends Model
     public function scopeActive($q)
     {
         return $q->select('id', 'is_active');
+    }
+
+    public function scopeGetCategoryProductsList($q)
+    {
+        return $q = Product::withoutGlobalScope(ProductScope::class)
+            ->select('id')
+            ->with(['ProductTranslation' => function ($q) {
+                return $q->where('product_translations.local',
+                    '=',
+                    Config::get('app.locale'))
+                    ->select(['product_translations.name',
+                        'product_translations.short_des',
+                        'product_translations.long_des',
+                        'product_translations.product_id'])
+                    ->get();
+            }, 'StoreProduct' => function ($qq) {
+                $qq->with(['StoreProductDetails' => function ($qqq) {
+                    $qqq->with('Custom_Field_Value')
+                        ->select(['store_product_details.id',
+                            'store_product_details.store_products_id',
+                            'store_product_details.price'])->get();
+                }]);
+            }]);
     }
 
     //______________________________ scopes end _______________________________________//

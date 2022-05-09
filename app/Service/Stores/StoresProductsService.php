@@ -2,6 +2,7 @@
 
 namespace App\Service\Stores;
 
+use App\Models\Categories\Category;
 use App\Models\Stores\Store;
 use App\Models\Products\Product;
 use App\Models\Stores\StoreProduct;
@@ -9,6 +10,7 @@ use App\Models\Stores\StoreProductDetails;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StoresProductsService
 {
@@ -18,19 +20,22 @@ class StoresProductsService
     private $productModel;
     private $storeModel;
     private $details;
+    private $category;
 
     public function __construct(StoreProduct        $storeProductModel,
-                                Product             $product, Store $store,
-                                StoreProductDetails $details)
+                                Product             $product,
+                                Store               $store,
+                                StoreProductDetails $details,
+                                Category            $category)
     {
         $this->storeProductModel = $storeProductModel;
         $this->productModel = $product;
         $this->storeModel = $store;
         $this->details = $details;
+        $this->category = $category;
     }
 
-    /*__________________________________________________________________*/
-    public function viewStoresHasProduct($id)
+    public function viewStoresHasProduct($id): JsonResponse
     {
         try {
             $product = $this->productModel->with('Store')->find($id);
@@ -44,8 +49,35 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function viewProductsInStore($store_id)
+    public function viewProductByCategory($category_id): JsonResponse
+    {
+        try {
+            $product = $this->category->getCategoryProductsList()->find($category_id);
+            if (is_null($product)) {
+                return $this->returnSuccessMessage('This Product not found', 'done');
+            } else {
+                return $this->returnData('Category', $product, 'done');
+            }
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
+    }
+
+    public function viewProductByCategoryDetails($product_id): JsonResponse
+    {
+        try {
+            $product = $this->productModel->getCategoryProductsList()->find($product_id);
+            if (is_null($product)) {
+                return $this->returnSuccessMessage('This Product not found', 'done');
+            } else {
+                return $this->returnData('Product', $product, 'done');
+            }
+        } catch (\Exception $ex) {
+            return $this->returnError('400', $ex->getMessage());
+        }
+    }
+
+    public function viewProductsInStore($store_id): JsonResponse
     {
         $product = $this->storeProductModel
             ->where('store_id', $store_id)
@@ -58,13 +90,10 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function viewProductsDetailsInStore($product_id)
+    public function viewProductsDetailsInStore($product_id): JsonResponse
     {
-        $product = $this->productModel
-            ->with(['Custom_Field_Value' => function ($q) {
-                return $q->with('Custom_field')->get();
-            }])->find($product_id);
+        $product = $this->storeProductModel
+            ->getStoreProductsList()->find($product_id);
         if (!is_null($product)) {
             return $this->returnData('Product in Store', $product, 'done');
         } else {
@@ -72,8 +101,7 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function rangeOfPrice($id)
+    public function rangeOfPrice($id): JsonResponse
     {
         try {
             $products = $this->storeProductModel->where('product_id', $id)->get();
@@ -92,8 +120,7 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function insertProductToStore(Request $request, $store_id)
+    public function insertProductToStore(Request $request, $store_id): JsonResponse
     {
         try {
             $Products = collect($request->products)->all();
@@ -123,8 +150,7 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function updateProductInStore(Request $request, $store_id, $product_id)
+    public function updateProductInStore(Request $request, $store_id, $product_id): JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -147,7 +173,7 @@ class StoresProductsService
         }
     }
 
-    protected function updateProductDetailsInStore($price, $quantity, $detailsId)
+    protected function updateProductDetailsInStore($price, $quantity, $detailsId): JsonResponse
     {
         try {
             $details = StoreProductDetails::find($detailsId);
@@ -160,8 +186,7 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function hiddenProductByQuantity($id)
+    public function hiddenProductByQuantity($id): JsonResponse
     {
         try {
             $product = $this->storeProductModel->find($id);
@@ -178,8 +203,7 @@ class StoresProductsService
         }
     }
 
-    /*__________________________________________________________________*/
-    public function updateMultyProductsPricesInStore(Request $request, $store_id)
+    public function updateMultyProductsPricesInStore(Request $request, $store_id): JsonResponse
     {
         $ids = $request->ids;
         foreach ($ids as $id) {
@@ -196,8 +220,7 @@ class StoresProductsService
         return $this->returnData('Product in Store', $storeProduct, 'done');
     }
 
-    /*__________________________________________________________________*/
-    public function updatePricesPyRatio(Request $request, $store_id)
+    public function updatePricesPyRatio(Request $request, $store_id): JsonResponse
     {
         $ids = $request->ids;
         foreach ($ids as $id) {
@@ -217,6 +240,23 @@ class StoresProductsService
             }
         }
         return $this->returnData('Product in Store', $storeProduct, 'done');
+    }
+
+    public function deleteProductFromStore($product_id): JsonResponse
+    {
+        try {
+            $product = $this->storeProductModel->find($product_id);
+            DB::beginTransaction();
+            $product->update([
+                'is_active' => 0
+            ]);
+            DB::commit();
+            return $this->returnData('deleted done', $product, 'done');
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
+        }
+
     }
 }
 

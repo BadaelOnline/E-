@@ -22,7 +22,7 @@ class StoreProduct extends Model
         'is_appear' => 'boolean'
     ];
     protected $fillable = [
-        'is_active', 'is_approve', 'store_id', 'product_id','created_at', 'updated_at',
+        'is_active', 'is_approve', 'store_id', 'product_id', 'created_at', 'updated_at',
     ];
 
     public function scopeGetStoreProductsList($q)
@@ -38,7 +38,41 @@ class StoreProduct extends Model
                         'product_translations.short_des'])
                     ->get();
             }, 'StoreProduct' => function ($qq) {
-                $qq->with('StoreProductDetails')->get();
+                $qq->with('StoreProductDetails')->where('is_active', 1)->get();
+            }]);
+    }
+    public function scopeGetCategoryProductsList($q)
+    {
+        return $q = Product::withoutGlobalScope(ProductScope::class)
+            ->select('id')
+            ->with(['ProductTranslation' => function ($q) {
+                return $q->where('product_translations.local',
+                    '=',
+                    Config::get('app.locale'))
+                    ->select(['product_translations.name',
+                        'product_translations.short_des',
+                        'product_translations.long_des',
+                        'product_translations.product_id'])
+                    ->get();
+            }, 'StoreProduct' => function ($qq) {
+                $qq->with('StoreProductDetails')->where('is_active', 1)->get();
+            }]);
+    }
+
+    public function scopeGetStoreProductDetails($q)
+    {
+        return $q = Product::withoutGlobalScope(ProductScope::class)
+            ->select('id')
+            ->with(['ProductTranslation' => function ($q) {
+                return $q->where('product_translations.local',
+                    '=',
+                    Config::get('app.locale'))
+                    ->select(['product_translations.name',
+                        'product_translations.product_id',
+                        'product_translations.short_des'])
+                    ->get();
+            }, 'StoreProduct' => function ($qq) {
+                $qq->with('StoreProductDetails')->where('is_active', 1)->get();
             }]);
     }
 

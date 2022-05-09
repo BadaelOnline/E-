@@ -157,18 +157,26 @@ Route::group(
             Route::GET('/users/get/{storeId}', 'StoreController@storeUsers');
             Route::GET('/users/delete/{storeId}/{userId}', 'StoreController@storeUsersDelete');
 
-            Route::POST('/insertProductToStore/{store_id}', 'StoresProductsController@insertProductToStore');
-            Route::PUT('/updateProductInStore/{store_id}/{product_id}', 'StoresProductsController@updateProductInStore');
+                /***______________ Store's Dashboard Routes ___________***/
+            Route::GET('/view-product-in-store/{store_id}', 'StoresProductsController@viewProductsInStore');
+            Route::PUT('/delete/{storeId}', 'StoresProductsController@deleteProductFromStore');
+            Route::POST('/assign/{store_id}', 'StoresProductsController@insertProductToStore');
+            Route::PUT('/update/{store_id}/{product_id}', 'StoresProductsController@updateProductInStore');
             Route::PUT('/hiddenProductByQuantity/{id}', 'StoresProductsController@hiddenProductByQuantity');
-            Route::GET('/viewStoresHasProduct/{id}', 'StoresProductsController@viewStoresHasProduct');
-            Route::GET('/viewProductsInStore/{id}', 'StoresProductsController@viewProductsInStore');
+
+                /***______________ Store's Dashboard Routes End ___________***/
+
+                /***______________ Products Page  Routes ___________***/
+            Route::GET('/product-category/{category_id}', 'StoresProductsController@viewProductByCategory');
+            Route::GET('/product-category-details/{product_id}', 'StoresProductsController@viewProductByCategoryDetails');
             Route::GET('/product-details/{product_id}', 'StoresProductsController@viewProductsDetailsInStore');
+            Route::GET('/viewStoresHasProduct/{id}', 'StoresProductsController@viewStoresHasProduct');
             Route::GET('/rangeOfPrice/{id}', 'StoresProductsController@rangeOfPrice');
             Route::PUT('/prices/{store_id}', 'StoresProductsController@updateMultyProductsPricesInStore');
             Route::PUT('/ratio/{store_id}', 'StoresProductsController@updatePricesPyRatio');
             Route::GET('/account/{storeId}', 'StoreController@account');
         });
-########################## DOCTOR ROUTE #########################################
+                    ########################## DOCTOR ROUTE #########################################
 
         /*-------------Doctor Route------------------*/
         Route::group(['namespace' => 'Doctors'], function () {
