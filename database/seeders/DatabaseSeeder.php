@@ -15,10 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-//         \App\Models\User::factory(10)->create();
         $this->call([
             LaratrustSeeder::class,
-//            RolePermissionSeeder::class,
             BrandSeeder::class,
             ProductSectionSeeder::class,
             BrandSectionSeeder::class,
@@ -38,44 +36,9 @@ class DatabaseSeeder extends Seeder
             ProductsSeeder::class,
             StoreSeeder::class,
             StoreProductsDetails::class,
-//            StoreImagesSeeder::class,
-//
-//
-//            DoctorSeeder::class,
-//            PatientSeeder::class,
-//            DoctorPatientSeeder::class,
-//            DoctorSpecialtySeeder::class,
-//            DoctorHospitalSeeder::class,
-//            DoctorMedicalDeviceSeeder::class,
-//            DoctorRateSeeder::class,
-//            ActiveTimeSedeer::class,
-//            appointmentSedeer::class,
-//            ClinicSedeer::class,
-//            HospitalSedeer::class,
-//            HospitalMedicalDeviceSeeder::class,
-//            MedicalDeviceSedeer::class,
             SocialMediaSedeer::class,
-//            SpecialtySedeer::class,
-//
-//            RestaurantSeeder::class,
-//            RestaurantTypeSeeder::class,
-//            RestaurantTypeRestaurantSeeder::class,
-//            RestaurantCategorySeeder::class,
-//            RestaurantProductSeeder::class,
-//            ItemSeeder::class,
-//            RestauranCategoryItemSeeder::class,
-//            RestauranCategoryProductSeeder::class,
-//            RestaurantItemSeeder::class,
-//            RestaurantRestauranCategorySeeder::class,
-//            RestaurantRestauranProductSeeder::class,
-//            RestaurantManagerSeeder::class,
-//
-           OfferSeeder::class,
-           store_product_offerSeeder::class,
-        //    CommentSeeder::class,
-//            InteractionSeeder::class,
-
-
+            OfferSeeder::class,
+            store_product_offerSeeder::class,
             CurrencySeeder::class,
             SubscriptionSeeder::class,
             PlanSeeder::class,
@@ -93,7 +56,8 @@ class DatabaseSeeder extends Seeder
             StorePaymentSeeder::class,
             LocationSeeder::class,
             DetailsCustomValue::class,
-            StoreProductsDetails::class
+            StoreProductsDetails::class,
+            ProductCustomValueSeeder::class
         ]);
 
     }

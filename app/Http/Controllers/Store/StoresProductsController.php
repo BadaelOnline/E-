@@ -23,18 +23,22 @@ class StoresProductsController extends Controller
         return $this->StoresProductsService->insertProductToStore($request, $store_id);
     }
 
-    public function updateProductInStore(Request $request,$store_id,$product_id)
+    public function updateProductInStore(Request $request, $store_id, $product_id)
     {
-        return $this->StoresProductsService->updateProductInStore($request,$store_id,$product_id);
+        return $this->StoresProductsService->updateProductInStore($request, $store_id, $product_id);
     }
-//    public function updateProductDetailsInStore($request,$detailsId)
-//    {
-//        return $this->StoresProductsService->updateProductDetailsInStore($request,$detailsId);
-//    }
 
     public function viewStoresHasProduct($id)
     {
         return $this->StoresProductsService->viewStoresHasProduct($id);
+    }
+    public function viewProductByCategory($category_id)
+    {
+        return $this->StoresProductsService->viewProductByCategory($category_id);
+    }
+    public function viewProductByCategoryDetails($product_id)
+    {
+        return $this->StoresProductsService->viewProductByCategoryDetails($product_id);
     }
 
     public function viewProductsInStore($store_id)
@@ -70,5 +74,10 @@ class StoresProductsController extends Controller
     public function updatePricesPyRatio(Request $request, $store_id)
     {
         return $this->StoresProductsService->updatePricesPyRatio($request, $store_id);
+    }
+
+    public function deleteProductFromStore($product_id)
+    {
+        return $this->StoresProductsService->deleteProductFromStore($product_id);
     }
 }
