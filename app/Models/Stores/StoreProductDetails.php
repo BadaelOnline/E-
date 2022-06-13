@@ -3,6 +3,7 @@
 namespace App\Models\Stores;
 
 use App\Models\Custom_Fieldes\Custom_Field_Value;
+use App\Models\Orders\Order_Details;
 use App\Models\Stores\StoreProduct;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,5 +30,9 @@ class StoreProductDetails extends Model
     public function StoreProduct(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(StoreProduct::class ,'store_products_id');
+    }
+    public function Order_Details()
+    {
+        return $this->belongsTo(Order_Details::class ,'store_products_id');
     }
 }

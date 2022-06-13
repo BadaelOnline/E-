@@ -37,7 +37,7 @@ class SectionService
         try{
 //            Gate::authorize('Read Section');
 
-            $section = $this->SectionModel->get();
+            $section = $this->SectionModel->with('Category')->get();
 
             if (count($section) > 0) {
                 return $this->returnData('Section', $section, 'done');

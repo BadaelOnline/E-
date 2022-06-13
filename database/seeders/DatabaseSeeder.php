@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             ShippingSeeder::class,
             ShippingStoreSeeder::class,
-            OrderDetailsSeeder::class,
+            // OrderDetailsSeeder::class,
             ActivityTypeSeeder::class,
             AttachmentSeeder::class,
             AttachmentTypeSeeder::class,

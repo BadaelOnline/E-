@@ -15,7 +15,6 @@ use App\Scopes\ProductScope;
 use App\Traits\GeneralTrait;
 use App\Http\Requests\ProductRequest;
 use App\Models\Products\Product;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -190,11 +189,31 @@ class ProductService
         try {
 //            Gate::authorize('Read Product');
 
-            $products = $this->categoryModel->with('Product')->find($id);
+            $products = $this->categoryModel->with(['Product'=>function($q){
+                $q->withoutGlobalScope(ProductScope::class)
+                    ->select('products.id')
+                    ->with(['ProductTranslation' => function ($q) {
+                        return $q->where('product_translations.local',
+                            '=',
+                            Config::get('app.locale'))
+                            ->select(['product_translations.name',
+                                'product_translations.short_des',
+                                'product_translations.long_des',
+                                'product_translations.product_id'])
+                            ->get();
+                    }, 'StoreProduct' => function ($qq) {
+                        $qq->with(['StoreProductDetails' => function ($qqq) {
+                            $qqq->with('Custom_Field_Value')
+                                ->select(['store_product_details.id',
+                                    'store_product_details.store_products_id',
+                                    'store_product_details.price'])->get();
+                        }]);
+                    }]);
+            }])->find($id);
             if (is_null($products)) {
                 return $this->returnSuccessMessage('This category not have products', 'done');
             } else {
-                return $this->returnData('Products', $products, 'done');
+                return $this->returnData('Category', $products, 'done');
             }
         } catch (\Exception $e) {
             return $this->returnError('400', $e->getMessage());

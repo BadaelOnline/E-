@@ -33,7 +33,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
-
         'middleware' => ['api', 'ChangeLanguage', 'localize', 'localizationRedirect', 'localeViewPath']
 //        /,'role:superadministrator|administrator|user']
     ],
@@ -42,11 +41,9 @@ Route::group(
         Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
         Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);
         /**__________________________ Product routes  __________________________**/
-
         Route::group(['prefix' => 'products', 'namespace' => 'Product'], function () {
-            Route::GET('/getAll', 'ProductsController@getAll');
-//                ->middleware('can:Read Brand');
-            Route::GET('/getProductByCategory/{id}', 'ProductsController@getProductByCategory');
+            Route::GET('/getAll', 'ProductsController@getAll');/** ->middleware('can:Read Brand'); **/
+            Route::GET('/get-product-by-category/{id}', 'ProductsController@getProductByCategory');
             Route::GET('/getById/{id}', 'ProductsController@getById');
             Route::POST('/create', 'ProductsController@create');
             Route::PUT('/update/{id}', 'ProductsController@update')->middleware('can:Update Product');
@@ -55,9 +52,9 @@ Route::group(
             Route::PUT('/restoreTrashed/{id}', 'ProductsController@restoreTrashed')->middleware('can:Restore Product');
             Route::GET('/getTrashed', 'ProductsController@getTrashed')->middleware('can:Read Product');
             Route::DELETE('/delete/{id}', 'ProductsController@delete')->middleware('can:Delete Product');
-            Route::post('upload-multi/{id}', 'ProductsController@uploadMultiple');
-            Route::get('filter', 'ProductsController@filter');
-            Route::post('upload/{id}', 'ProductsController@upload');
+            Route::POST('upload-multi/{id}', 'ProductsController@uploadMultiple');
+            Route::GET('filter', 'ProductsController@filter');
+            Route::POST('upload/{id}', 'ProductsController@upload');
 
         });
         /**__________________________ Payment routes  __________________________**/
@@ -78,7 +75,7 @@ Route::group(
         });
         /**__________________________ Category routes __________________________**/
         Route::group(['prefix' => 'categories', 'namespace' => 'Category'], function () {
-            Route::GET('/getAll', 'CategoriesController@getAll');
+            Route::GET('/get', 'CategoriesController@getAll');
             Route::GET('/getById/{id}', 'CategoriesController@getById');
             Route::GET('/getCategoryBySelf/{id}', 'CategoriesController@getCategoryBySelf');
             Route::POST('/create', 'CategoriesController@create')->middleware('can:Create Category');
@@ -140,7 +137,7 @@ Route::group(
         });
         /**__________________________ Store routes    __________________________**/
         Route::group(['prefix' => 'stores', 'namespace' => 'Store'], function () {
-            Route::GET('/getAll', 'StoreController@getAll');
+            Route::GET('/get', 'StoreController@getAll');
             Route::GET('/getById/{id}', 'StoreController@getById');
             Route::POST('/create', 'StoreController@store');
             Route::PUT('/update/{id}', 'StoreController@update');
@@ -157,16 +154,16 @@ Route::group(
             Route::GET('/users/get/{storeId}', 'StoreController@storeUsers');
             Route::GET('/users/delete/{storeId}/{userId}', 'StoreController@storeUsersDelete');
 
-                /***______________ Store's Dashboard Routes ___________***/
+            /***______________ Store's Dashboard Routes ___________***/
             Route::GET('/view-product-in-store/{store_id}', 'StoresProductsController@viewProductsInStore');
             Route::PUT('/delete/{storeId}', 'StoresProductsController@deleteProductFromStore');
             Route::POST('/assign/{store_id}', 'StoresProductsController@insertProductToStore');
             Route::PUT('/update/{store_id}/{product_id}', 'StoresProductsController@updateProductInStore');
             Route::PUT('/hiddenProductByQuantity/{id}', 'StoresProductsController@hiddenProductByQuantity');
 
-                /***______________ Store's Dashboard Routes End ___________***/
+            /***______________ Store's Dashboard Routes End ___________***/
 
-                /***______________ Products Page  Routes ___________***/
+            /***______________ Products Page  Routes ___________***/
             Route::GET('/product-category/{category_id}', 'StoresProductsController@viewProductByCategory');
             Route::GET('/product-category-details/{product_id}', 'StoresProductsController@viewProductByCategoryDetails');
             Route::GET('/product-details/{product_id}', 'StoresProductsController@viewProductsDetailsInStore');
@@ -176,7 +173,7 @@ Route::group(
             Route::PUT('/ratio/{store_id}', 'StoresProductsController@updatePricesPyRatio');
             Route::GET('/account/{storeId}', 'StoreController@account');
         });
-                    ########################## DOCTOR ROUTE #########################################
+        ########################## DOCTOR ROUTE #########################################
 
         /*-------------Doctor Route------------------*/
         Route::group(['namespace' => 'Doctors'], function () {
@@ -298,18 +295,6 @@ Route::group(
             Route::get('/specialty/specialty-doctor/{speciatlty_id}', 'SpecialtyController@DoctorSpecialty');
         });
         Route::GET('specialties/gettrashed', [SpecialtyController::class, 'getTrashed']);
-
-        /*--------------- Calendar Route-------------*/
-        //Route::group(['prefix'=>'Calendar','namespace'=>'Calendar'],function ()
-        //  {
-        //    Route::get('/',          'CalendarController@get');
-        //    Route::get('/{id}', 'CalendarController@getById');
-        //    Route::post('/create',      'CalendarController@create');
-        //    Route::put('/{id}',  'CalendarController@update');
-        //    Route::PUT('/trash/{id}',   'CalendarController@trash');
-        //    Route::delete('/{id}','CalendarController@delete');
-        //    Route::PUT('/restoreTrashed/{id}', 'CalendarController@restoreTrashed');
-        //});
         /*---------------Appointment Route-------------*/
         Route::group(['namespace' => 'Appointment'], function () {
             Route::GET('/appointments', 'AppointmentController@get');
@@ -334,22 +319,6 @@ Route::group(
         });
         Route::GET('/active-times/gettrashed', [ActiveTimeController::class, 'getTrashed']);
 
-
-        ########################## RESTAURANT ROUTE #########################################
-        /*-------------Restaurant  Manager Route------------------*/
-        //  Route::group(['prefix'=>'restaurantsmangers','namespace'=>'RestaurantManager'],function ()
-        //  {
-        //    Route::get('/', 'RestaurantManagerController@get');
-        //    Route::get('/{id}', 'RestaurantManagerController@getById');
-        //    Route::GET('search/{name}','RestaurantManagerController@search');
-        //    Route::post('/', 'RestaurantManagerController@create');
-        //    Route::put('/{id}', 'RestaurantManagerController@update');
-        //    Route::PUT('trash/{id}', 'RestaurantManagerController@trash');
-        //    Route::PUT('restortrashed/{id}', 'RestaurantManagerController@restoreTrashed');
-        //    Route::delete('/{id}', 'RestaurantManagerController@delete');
-        // });
-        // Route::get('restaurant/gettrashed', [RestaurantManagerController::class,'getTrashed']);
-
         /*-------------Restaurant  Route------------------*/
         Route::group(['namespace' => 'Restaurant'], function () {
             Route::GET('/restaurants', 'RestaurantController@get');
@@ -372,7 +341,6 @@ Route::group(
 
         });
         Route::GET('/restaurants/gettrashed', [RestaurantController::class, 'getTrashed']);
-
 
         /*-------------Restaurant Type  Route------------------*/
         Route::group(['namespace' => 'RestaurantType'], function () {
@@ -437,7 +405,7 @@ Route::group(
         });
         Route::get('/restaurants/item/gettrashed', [ItemController::class, 'getTrashed']);
         Route::Post('upload', 'TestController@store');
-        ################ OFFERS ROUTE ##################################
+
         //////////////// offers Route ////////////////////////////
         Route::group(['namespace' => 'Offer', 'prefix' => 'offer'], function () {
             Route::get('/getAll', 'OfferController@get');
@@ -544,4 +512,12 @@ Route::group(
             Route::DELETE('/delete/{id}', 'AttachmentsController@delete');
         });
         Route::get('artisan', 'Commands\Command@migrateDatabase');
+        Route::group(['prefix' => 'orders', 'namespace' => 'Orders'], function () {
+            Route::get('/get', 'OrdersDetailsController@getAll');
+            Route::get('/get/{storeId}', 'OrdersDetailsController@getByStore');
+            Route::post('/assigning/{storeId}', 'OrdersDetailsController@assigningToStore');
+            Route::post('/delete/{storeId}/{paymentId}', 'OrdersDetailsController@deleteFromStore');
+            Route::post('/create', 'OrdersController@create');
+        });
+
     });

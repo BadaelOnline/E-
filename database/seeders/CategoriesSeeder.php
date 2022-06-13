@@ -22,7 +22,7 @@ class CategoriesSeeder extends Seeder
                 'is_active' => $faker->boolean,
                 'image' => $faker->boolean,
                 'parent_id' => $faker->numberBetween(1,5),
-                'section_id' =>  $faker->numberBetween(1,10)
+                'section_id' =>  $faker->numberBetween(1,5)
             ]);
             DB::table('category_translations')->insert([[
                 'name' => $faker->sentence(5),
