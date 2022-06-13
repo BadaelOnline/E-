@@ -48,8 +48,8 @@ class  StoreService
 
     private function fillStore($request_arr, $store_social, $logo_folder)
     {
-        return (
-        ['currency_id' => $request_arr['currency_id'],
+        return ([
+            'currency_id' => $request_arr['currency_id'],
             'location_id' => $request_arr['location_id'],
             'social_media_id' => $store_social,
             'activity_type_id' => $request_arr['activity_type_id'],
@@ -107,22 +107,7 @@ class  StoreService
     public function getAll()
     {
         try {
-            $store = $this->storeModel->with([
-                'Section',
-                'Product',
-                'Brand' => function ($q) {
-                    return $q->withoutGlobalScope(BrandScope::class)
-                        ->select(['brands.id'])
-                        ->with(['BrandTranslation' => function ($q) {
-                            return $q->where('brand_translation.local', '='
-                                , Config::get('app.locale'))
-                                ->select(['brand_translation.name', 'brand_translation.brand_id'
-                                ])->get();
-                        }])->get();
-                },
-                'StoreImage' => function ($q) {
-                    return $q->where('is_cover', 1)->get();
-                }])->get();
+            $store = $this->storeModel->get();
             return count($store) > 0 ? $this->returnData('Stores', $store, 'done') :
                 $this->returnSuccessMessage('Store', 'stores doesnt exist yet');
         } catch (\Exception $ex) {

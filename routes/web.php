@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function (Request $request) {
 
-    return view('welcome');
+    return view('home');
 });
 
 Route::group(['prefix' => 'auth', 'middleware' => ['api']], function () {

@@ -16,7 +16,8 @@ class CategoryScope implements Scope
         $builder->join('category_translations', 'categories.id', '=', 'category_translations.category_id')
             ->where('category_translations.local', '=', Config::get('app.locale'))
             ->select([
-                'categories.id','parent_id','categories.is_active','categories.image','categories.slug',
+                'categories.id','categories.parent_id','categories.is_active',
+                'categories.image','categories.slug',
                 'categories.section_id',
                 'category_translations.name', 'category_translations.local']);
     }

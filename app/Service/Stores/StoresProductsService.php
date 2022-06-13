@@ -70,7 +70,7 @@ class StoresProductsService
             if (is_null($product)) {
                 return $this->returnSuccessMessage('This Product not found', 'done');
             } else {
-                return $this->returnData('Product', $product, 'done');
+                return $this->returnData('Category', $product, 'done');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
@@ -150,7 +150,7 @@ class StoresProductsService
         }
     }
 
-    public function updateProductInStore(Request $request, $store_id, $product_id): JsonResponse
+    public function updateProductInStore(Request $request, $store_id, $product_id)
     {
         try {
             DB::beginTransaction();
@@ -166,14 +166,14 @@ class StoresProductsService
                 $details_new_value['id']
             );
             DB::commit();
-            return $this->returnData('New Product in Store', $details_new_value, 'done');
+            return $this->returnData('New Product in Store', $store_products, 'done');
         } catch (\Exception $ex) {
             DB::rollBack();
             return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
         }
     }
 
-    protected function updateProductDetailsInStore($price, $quantity, $detailsId): JsonResponse
+    public function updateProductDetailsInStore($price, $quantity, $detailsId)
     {
         try {
             $details = StoreProductDetails::find($detailsId);
@@ -181,6 +181,7 @@ class StoresProductsService
                 'price' => $price,
                 'quantity' => $quantity
             ]);
+//            return $details;
         } catch (\Exception $ex) {
             return $this->returnError('400', [$ex->getMessage(), $ex->getLine()]);
         }
