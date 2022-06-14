@@ -2,6 +2,7 @@
 
 namespace App\Models\Categories;
 
+use App\Models\Custom_Fieldes\Custom_Field;
 use App\Models\Images\CategoryImages;
 use App\Models\Products\Product;
 use App\Scopes\CategoryScope;
@@ -59,8 +60,8 @@ class Category extends Model
                         'product_translations.product_id'])
                     ->get();
             }, 'StoreProduct' => function ($qq) {
-                $qq->with(['StoreProductDetails'=>function($qqq){
-                    $qqq->select(['store_product_details.id','store_product_details.store_products_id','store_product_details.price'])->get();
+                $qq->with(['StoreProductDetails' => function ($qqq) {
+                    $qqq->select(['store_product_details.id', 'store_product_details.store_products_id', 'store_product_details.price'])->get();
                 }])->where('is_active', 1)->get();
             }]);
     }
@@ -99,6 +100,16 @@ class Category extends Model
     {
         return $this->hasMany(ProductCategory::class);
     }
+
+    public function CustomField()
+    {
+        return $this->belongsToMany(
+            Custom_Field::class,
+            'category_customFields',
+            'category_id',
+            'custom_field_id');
+    }
 }
+
 //1992fahed1992@
 //651

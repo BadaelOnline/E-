@@ -19,14 +19,14 @@ class StoreSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             $s = DB::table('stores')->insertGetId([
                 'currency_id' =>  $faker->numberBetween(1,10),
-                'location_id' =>  $faker->numberBetween(1,10),
-                'social_media_id' =>  $faker->numberBetween(1,10),
-                'activity_type_id'=>  $faker->numberBetween(1,10),
-                'owner_id'=> $faker->numberBetween(1,10),
-                'section_id'=> $faker->numberBetween(1,10),
+                'location_id' => 1,
+                'social_media_id' =>  1,
+                'activity_type_id'=>  1,
+                'owner_id'=> 1,
+                'section_id'=> 1,
                 'is_active'=> $faker->boolean(),
                 'is_approved'=> $faker->boolean(),
-                'logo'=>$faker->sentence(1),
+                'logo'=>$faker->imageUrl(),
             ]);
             DB::table('store_translations')->insert([
                 [

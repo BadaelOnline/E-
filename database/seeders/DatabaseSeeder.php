@@ -57,7 +57,8 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             DetailsCustomValue::class,
             StoreProductsDetails::class,
-            ProductCustomValueSeeder::class
+            ProductCustomValueSeeder::class,
+            CategoryCustomFieldsSeeder::class
         ]);
 
     }

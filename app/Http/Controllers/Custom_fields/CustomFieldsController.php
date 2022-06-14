@@ -37,6 +37,10 @@ class CustomFieldsController extends Controller
     {
         return $this->customfieldService->getCustomFieldsByProduct($id);
     }
+    public function getCustomFieldsByCategory($category_id)
+    {
+        return $this->customfieldService->getCustomFieldsByCategory($category_id);
+    }
     public function getById($id)
     {
         return $this->customfieldService->getById($id);

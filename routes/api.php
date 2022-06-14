@@ -69,7 +69,7 @@ Route::group(
         });
         Route::group(['prefix' => 'shipping', 'namespace' => 'Shippings'], function () {
             Route::get('/get', 'ShippingMethodsController@getALl');
-            Route::get('/get/{storeId}', 'ShippingMethodsController@getByStore');
+            Route::get('/get-by-store/{storeId}', 'ShippingMethodsController@getByStore');
             Route::post('/assigning/{storeId}', 'ShippingMethodsController@assigningToStore');
             Route::post('/delete/{storeId}/{paymentId}', 'ShippingMethodsController@deleteFromStore');
         });
@@ -108,6 +108,7 @@ Route::group(
         Route::group(['prefix' => 'customfields', 'namespace' => 'Custom_fields'], function () {
             Route::GET('/getAll', 'CustomFieldsController@getAll')->middleware('can:Read Custom_field');
             Route::GET('/getById/{id}', 'CustomFieldsController@getById')->middleware('can:Read Custom_field');
+            Route::GET('/get-customFields-by-category/{category_id}', 'CustomFieldsController@getCustomFieldsByCategory');
             Route::GET('/getCategoryBySelf/{id}', 'CustomFieldsController@getCategoryBySelf')->middleware('can:Read Custom_field');
             Route::POST('/create', 'CustomFieldsController@create')->middleware('can:Create Custom_field');
             Route::PUT('/update/{id}', 'CustomFieldsController@update')->middleware('can:Update Custom_field');

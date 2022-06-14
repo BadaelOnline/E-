@@ -34,8 +34,4 @@ class Order extends Model
     {
         return $this->belongsTo(User::class,'user_id');
     }
-    public function Shipping_Method()
-    {
-        return $this->belongsTo(Shipping_Method::class,'order_id');
-    }
 }

@@ -6,6 +6,7 @@ use App\Models\Admin\Role;
 use App\Models\Comment\Comment;
 use App\Models\Doctors\Patient;
 use App\Models\Interaction\Interaction;
+use App\Models\Location\Location;
 use App\Models\SocialMedia\SocialMedia;
 use App\Models\Admin\TransModel\UserTranslation;
 use App\Models\Admin\TypeUser;
@@ -105,10 +106,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Patient::class);
     }
-    public function socialMedia()
-    {
-        return $this->hasMany(SocialMedia::class);
-    }
     public function Comment()
     {
         return $this->hasMany(Comment::class);
@@ -131,5 +128,13 @@ class User extends Authenticatable implements JWTSubject
     Public function Owned()
     {
         return $this->hasMany(Store::class, 'owner_id');
+    }
+    Public function Location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+    Public function SocialMedia()
+    {
+        return $this->belongsTo(SocialMedia::class, 'social_media_id');
     }
 }

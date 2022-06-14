@@ -14,7 +14,7 @@ class UsersController extends Controller
     private $userService;
     public function __construct(UserService $userService)
     {
-        $this->middleware('auth:api');
+//        $this->middleware('auth:api');
         //        $this->middleware(['role:superadministrator']);
 //        $this->middleware(['permission:user-read'])->only('getAll','getById');
 //        $this->middleware(['permission:user-create'])->only('create');
@@ -25,6 +25,10 @@ class UsersController extends Controller
     public function getAll()
     {
         return $this->userService->getAll();
+    }
+    public function getLocation($user_id)
+    {
+        return $this->userService->getLocation($user_id);
     }
     public function getById($id)
     {

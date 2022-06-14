@@ -20,7 +20,6 @@ class TransactionSeeder extends Seeder
                 DB::table('transactions')->insert([
                     'payment_method_id' => $payment_method_id,
                     'total' => $total,
-
                 ]);
             }
         }

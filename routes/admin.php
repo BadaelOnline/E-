@@ -77,6 +77,7 @@ Route::group(
             Route::GET('/getTrashed', 'UsersController@getTrashed');
             Route::DELETE('/delete/{id}', 'UsersController@delete');
             Route::GET('/profile/{id}', 'UsersController@profile');
+            Route::GET('/location/{user_id}', 'UsersController@getLocation');
         });
         /**__________________________ Employee routes  __________________________**/
         Route::group(['prefix' => 'employee', 'namespace' => 'Admin'], function () {
