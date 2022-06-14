@@ -4,6 +4,7 @@ namespace App\Service\Admin;
 
 use App\Models\Admin\Role;
 use App\Models\Admin\TransModel\UserTranslation;
+use App\Models\SocialMedia\SocialMedia;
 use App\Models\User;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
@@ -62,6 +63,16 @@ class UserService
 //            }else{
 //                return $response= $this->returnSuccessMessage('User','User doesnt exist yet');
 //            }
+        }catch(\Exception $ex){
+            return $this->returnError('400', $ex->getMessage());
+        }
+    }
+
+    public function getLocation($user_id)
+    {
+        try{
+             $user =$this->userModel->with(['Location','SocialMedia'])->find($user_id);
+                return $this->returnData('User',$user,'done');
         }catch(\Exception $ex){
             return $this->returnError('400', $ex->getMessage());
         }

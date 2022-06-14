@@ -18,8 +18,10 @@ class LocationSeeder extends Seeder
         $faker=Faker::create();
         for ($i = 1; $i <= 5; $i++) {
             DB::table('locations')->insert([
-                'name'=>$faker->address(),
-                'address'=>$faker->address(),
+                'country'=>$faker->country(),
+                'governorate'=>$faker->city(),
+                'street'=>$faker->streetAddress(),
+                'building_name'=>$faker->buildingNumber(),
                 'latitude'=>$faker->latitude(),
                 'longitude'=>$faker->longitude(),
                 'is_active'=>$faker->boolean(),

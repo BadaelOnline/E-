@@ -2,6 +2,7 @@
 namespace App\Service\CustomFields;
 
 use App\Http\Requests\CustomField\CustomFieldRequest;
+use App\Models\Categories\Category;
 use App\Models\Custom_Fieldes\Custom_Field;
 use App\Models\Custom_Fieldes\Custom_Field_Translation;
 use App\Models\Custom_Fieldes\Custom_Field_Value;
@@ -17,16 +18,19 @@ class CustomFieldService
     use GeneralTrait;
     private $CustomFieldModel;
     private $Custom_Field_Translation;
+    private $category;
 
     /**
      * Custom_field Service constructor.
      * @param Custom_Field $CustomFieldModel
      * @param Custom_Field_Translation $Custom_Field_Translation
+     * @param Category $category
      */
-    public function __construct(Custom_Field $CustomFieldModel , Custom_Field_Translation $Custom_Field_Translation)
+    public function __construct(Custom_Field $CustomFieldModel , Custom_Field_Translation $Custom_Field_Translation, Category $category)
     {
         $this->CustomFieldModel=$CustomFieldModel;
         $this->Custom_Field_Translation=$Custom_Field_Translation;
+        $this->category=$category;
     }
     /*___________________________________________________________________________*/
     /****Get All Active Custom_field Or By ID  ****/
@@ -65,6 +69,12 @@ class CustomFieldService
         Gate::authorize('Read Custom_field');
         $custom_field=$this->CustomFieldModel->with('Product')->get();
         return $this->returnData('Custom_field',$custom_field,'done');
+    }
+    public function getCustomFieldsByCategory($category_id)
+    {
+//        Gate::authorize('Read Custom_field');
+        $custom_fields=$this->category->with('CustomField')->find($category_id);
+        return $this->returnData('Category Custom_fields',$custom_fields,'done');
     }
     /*___________________________________________________________________________*/
     /****ــــــThis Functions For Trashed Custom_field  ****/

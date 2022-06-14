@@ -19,11 +19,11 @@ class SubscriptionSeeder extends Seeder
         for ($store_id = 1; $store_id <= 5; $store_id++) {
             for ($plan_id = 1; $plan_id <= 5; $plan_id++) {
                 DB::table('subscriptions')->insert([
-                    'store_id' => $faker->numberBetween(1, 5),
-                    'plan_id' => $faker->numberBetween(1, 5),
+                    'store_id' => $faker->numberBetween(1, 2),
+                    'plan_id' => $faker->numberBetween(1, 2),
                     'start_date' => $faker->date('Y-m-d'),
                     'end_date' => $faker->date('Y-m-d'),
-                    'transaction_id' => $faker->numberBetween(1, 5),
+                    'transaction_id' => $faker->numberBetween(1, 2),
                     'is_active' => $faker->boolean(),
                 ]);
             }
