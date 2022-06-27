@@ -15,7 +15,7 @@ class Shipping_Method extends Model
     protected $table ='shipping_method';
     protected $fillable=['name'];
     protected $hidden = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at','pivot'
     ];
     public function Shipping_Method()
     {

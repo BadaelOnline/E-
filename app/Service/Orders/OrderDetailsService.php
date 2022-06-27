@@ -27,7 +27,19 @@ class OrderDetailsService
         $this->storemodel = $storemodel;
     }
 
-    /****Get All  plans  ****/
+    private function fillOrderDetails($request_arr, $order_id)
+    {
+        return (
+        [
+            'is_active' => 1,
+            'is_appear' => 1,
+            'qty' => $request_arr['qty'],
+            'price' => $request_arr['price'],
+            'store_products_details_id' => $request_arr['store_products_details_id'],
+            'order_id' => $order_id,
+        ]);
+    }
+
     public function getAll()
     {
         try {
@@ -85,7 +97,6 @@ class OrderDetailsService
     public function getById($id)
     {
         try {
-//            Gate::authorize('Read Brand');
             $plan = $this->orders->findOrFail($id);
             if (!isset($plan)) {
                 return $this->returnSuccessMessage('This plan not found', 'done');
@@ -159,40 +170,24 @@ class OrderDetailsService
         }
     }
     /*__________________________________________________________________*/
-    /****  Create plan   ***
+    /****  Create order_details   ***
+     * @param Request $request
+     * @param $order_id
      * @return JsonResponse
      */
-    public function create(PlanRequest $request)
+    public function create($request, $order_id): JsonResponse
     {
         try {
-            $request->validated();
-            $request->is_active ? $is_active = true : $is_active = false;
-            /** transformation to collection */
-            $allplans = collect($request->plan)->all();
             DB::beginTransaction();
-            /** create the default language's ActivityType **/
-            $unTransplanid = $this->orders->insertGetId([
-                'is_active' => $request['is_active'],
-                'activity_id' => $request['activity_id'],
-                'price_per_month' => $request['price_per_month']
-            ]);
-            /** check the ActivityType and request */
-            if (isset($allplans) && count($allplans)) {
-                /**  insert other translations for ActivityType */
-                foreach ($allplans as $allplan) {
-                    $transaplan_arr[] = [
-                        'name' => $allplan ['name'],
-                        'local' => $allplan['local'],
-                        'plan_id' => $unTransplanid,
-                    ];
-                }
-                $this->planTranslation->insert($transaplan_arr);
-            }
+            collect($request);
+            $order_details = $this->orders->create(
+                $this->fillOrderDetails($request, $order_id)
+            );
             DB::commit();
-            return $this->returnData('plan', [$unTransplanid, $allplans], 'done');
+            return $this->returnData('order_details', $order_details, 'done');
         } catch (\Exception $ex) {
             DB::rollback();
-            return $this->returnError('plan', $ex->getMessage());
+            return $this->returnError('order_details', $ex->getMessage());
         }
     }
     /*__________________________________________________________________*/

@@ -13,7 +13,7 @@ class CreateCategoryCustomfieldsTable extends Migration
      */
     public function up()
     {
-        Schema::create('category_customfields', function (Blueprint $table) {
+        Schema::create('category_custom_fields', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('category_id');
             $table->unsignedInteger('custom_field_id');
@@ -28,6 +28,6 @@ class CreateCategoryCustomfieldsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('category_customfields');
+        Schema::dropIfExists('category_custom_fields');
     }
 }

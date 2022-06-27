@@ -49,8 +49,8 @@ class Custom_Field extends Model
     public function Category()
     {
         return $this->belongsToMany(Category::class,
-            'category_customFields',
-            'customfield_id',
+            'category_custom_fields',
+            'custom_field_id',
             'category_id');
     }
 

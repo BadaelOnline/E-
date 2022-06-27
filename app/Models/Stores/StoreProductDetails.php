@@ -14,9 +14,8 @@ class StoreProductDetails extends Model
 
     protected $primaryKey = 'id';
     protected $table = 'store_product_details';
-    protected $fillable = ['price', 'quantity', 'store_products_id'];
-    protected $hidden = ['created_at', 'updated_at','pivot'];
-//    protected $hidden = ;
+    protected $fillable = ['price', 'quantity', 'store_products_id', 'created_at', 'updated_at',];
+    protected $hidden = ['created_at', 'updated_at', 'pivot'];
 
     public function Custom_Field_Value()
     {
@@ -29,10 +28,11 @@ class StoreProductDetails extends Model
 
     public function StoreProduct(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(StoreProduct::class ,'store_products_id');
+        return $this->belongsTo(StoreProduct::class, 'store_products_id');
     }
+
     public function Order_Details()
     {
-        return $this->belongsTo(Order_Details::class ,'store_products_id');
+        return $this->belongsTo(Order_Details::class, 'store_products_id');
     }
 }
