@@ -18,7 +18,7 @@ class LaratrustSeeder extends Seeder
     public function run()
     {
         $this->truncateLaratrustTables();
-        $faker=Faker::create();
+        $faker = Faker::create();
 
         $config = Config::get('laratrust_seeder.roles_structure');
 
@@ -93,81 +93,19 @@ class LaratrustSeeder extends Seeder
                 $this->command->info("Creating '{$key}' user");
                 // Create default user for each role
                 $user = \App\Models\User::firstOrCreate([
-                    'first_name'=> ucwords(str_replace('_', ' ', $key)),
-                    'last_name'=>ucwords(str_replace('_', ' ', $key)),
-                    'username'=>ucwords(str_replace('_', ' ', $key)),
+                    'first_name' => ucwords(str_replace('_', ' ', $key)),
+                    'last_name' => ucwords(str_replace('_', ' ', $key)),
+                    'username' => ucwords(str_replace('_', ' ', $key)),
                     'age' => rand(20, 50),
-                    'location_id' => rand(20, 50),
-                    'social_media_id' => rand(20, 50),
-                    'is_active' => rand(0, 1),
-                    'image' => $faker->sentence(3),
+                    'location_id' => rand(1, 5),
+                    'social_media_id' => rand(1, 5),
+                    'is_active' => 1,
+                    'image' => $faker->imageUrl(),
                     'email' => $key . '@app.com',
                     'password' => bcrypt('password')
                 ]);
-                $userid=$user->id;
+                $userid = $user->id;
                 $user->roles()->syncWithoutDetaching($role);
-                // Create default employee for each role\
-//                if (Config::get('laratrust_seeder.create_employees')) {
-//
-//                    $this->command->info("Creating '{$key}' employee");
-//                    // Create default employee for each role
-//
-//                    $employee = \App\Models\Admin\Employee::firstOrCreate([
-//                        'first_name'=>$faker->name(),
-//                        'last_name'=>$faker->name(),
-//                        'username'=>$faker->name(),
-//                        'age' => rand(20, 50),
-//                        'location_id' => rand(20, 50),
-//                        'social_media_id' => rand(20, 50),
-//                        'is_active' => rand(0, 1),
-//                        'image' => $faker->sentence(3),
-//                        'email' => $key . '@app.com',
-//                        'salary'=>rand(25000, 5000),
-//                        'certificate' =>$faker->sentence(3),
-//                        'start_date' =>$faker->date('Y-m-d'),
-//                        'password' => bcrypt('password')
-//                    ]);
-//                    $employeeid=$employee->id;
-////                    $employeeTrans = DB::table('employee_translation')->insert([
-////                        [
-////                            'first_name' => ucwords(str_replace('_', ' ', $key)),
-////                            'last_name' => ucwords(str_replace('_', ' ', $key)),
-////                            'local' => 'en',
-////                            'employee_id' => $employeeid
-////                        ],
-////                        [
-////                            'first_name' => ucwords(str_replace('_', ' ', $key)),
-////                            'last_name' => ucwords(str_replace('_', ' ', $key)),
-////                            'local' => 'ar',
-////                            'employee_id' => $employeeid
-////                        ]
-////                    ]);
-//                    $employee->attachRole($role);
-//                }
-                // Create default Type for each role\
-//                if (Config::get('laratrust_seeder.create_types')) {
-//                    $this->command->info("Creating '{$key}' type");
-//                    // Create default type for each role
-//                    $type = \App\Models\Admin\TypeUser::firstOrCreate([
-//                        'is_active' => rand(0, 1)
-//                    ]);
-//                    $typeid=$type->id;
-//                    $typeTrans = DB::table('type_users_translation')->insert([
-//                        [
-//                            'name' => ucwords(str_replace('_', ' ', $key)),
-//                            'description' => ucwords(str_replace('_', ' ', $key)),
-//                            'local' => 'en',
-//                            'type_users_id' => $typeid
-//                        ],
-//                        [
-//                            'name' => ucwords(str_replace('_', ' ', $key)),
-//                            'description' => ucwords(str_replace('_', ' ', $key)),
-//                            'local' => 'ar',
-//                            'type_users_id' => $typeid
-//                        ]
-//                    ]);
-//                    $type->attachRole($role);
-//                }
             }
         }
     }
@@ -183,12 +121,8 @@ class LaratrustSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
 
         DB::table('permission_role')->truncate();
-//        DB::table('permission_user')->truncate();
         DB::table('role_user')->truncate();
-//        DB::table('role_employee')->truncate();
         DB::table('role_type')->truncate();
-//        DB::table('permission_employee')->truncate();
-//        DB::table('permission_type')->truncate();
 
         if (Config::get('laratrust_seeder.truncate_tables')) {
             DB::table('roles')->truncate();
@@ -197,16 +131,8 @@ class LaratrustSeeder extends Seeder
             if (Config::get('laratrust_seeder.create_users')) {
                 $usersTable = (new \App\Models\User)->getTable();
                 $usersTransTable = (new \App\Models\Admin\TransModel\UserTranslation)->getTable();
-//                $typeTable = (new \App\Models\Admin\TypeUser())->getTable();
-//                $typeTransTable = (new \App\Models\Admin\TransModel\TypeUserTranslation())->getTable();
-//                $employeesTable = (new \App\Models\Admin\Employee)->getTable();
-//                $employeesTransTable = (new \App\Models\Admin\TransModel\EmployeeTranslation)->getTable();
                 DB::table($usersTable)->truncate();
                 DB::table($usersTransTable)->truncate();
-//                DB::table($employeesTable)->truncate();
-//                DB::table($employeesTransTable)->truncate();
-//                DB::table($typeTable)->truncate();
-//                DB::table($typeTransTable)->truncate();
             }
         }
         Schema::disableForeignKeyConstraints();

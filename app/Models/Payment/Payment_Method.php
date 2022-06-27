@@ -14,7 +14,7 @@ class Payment_Method extends Model
     protected $table ='payment_methods';
     protected $fillable=['name'];
     protected $hidden = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at','pivot'
     ];
 
     public function Transaction()

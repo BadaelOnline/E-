@@ -105,7 +105,7 @@ class Category extends Model
     {
         return $this->belongsToMany(
             Custom_Field::class,
-            'category_customFields',
+            'category_custom_fields',
             'category_id',
             'custom_field_id');
     }

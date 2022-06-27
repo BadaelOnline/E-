@@ -41,9 +41,9 @@ class OrdersDetailsController extends Controller
     {
         return $this->details->getTrashed();
     }
-    public function create(PlanRequest $request)
+    public function create(Request $request , $order_id)
     {
-        return $this->details->create($request);
+        return $this->details->create($request , $order_id);
     }
     public function update(PlanRequest $request,$id)
     {

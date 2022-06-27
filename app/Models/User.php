@@ -14,6 +14,10 @@ use App\Models\Stores\Store;
 use App\Models\Stores_Orders\Stores_Order;
 use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -21,6 +25,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -60,14 +65,17 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
      */
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
+
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
@@ -77,18 +85,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-    public function UserTranslation()
+
+    public function UserTranslation(): HasMany
     {
         return $this->hasMany(UserTranslation::class);
     }
-    public function TypeUser(){
+
+    public function TypeUser(): BelongsToMany
+    {
         return $this->belongsToMany(
             TypeUser::class,
             'user_types',
             'user_id',
             'type_id');
     }
-    public function roles()
+
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
             Role::class,
@@ -98,42 +110,51 @@ class User extends Authenticatable implements JWTSubject
             'id',
             'id');
     }
-    public function Stores_Order()
+
+    public function Stores_Order(): HasMany
     {
         return $this->hasMany(Stores_Order::class);
     }
-    public function Patient()
+
+    public function Patient(): HasMany
     {
         return $this->hasMany(Patient::class);
     }
-    public function Comment()
+
+    public function Comment(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
-    public function Interaction()
+
+    public function Interaction(): HasOne
     {
         return $this->hasOne(Interaction::class);
     }
-    Public function Doctor()
+
+    public function Doctor(): HasOne
     {
         return $this->hasOne(Doctor::class);
     }
-    Public function Store()
+
+    public function Store(): BelongsToMany
     {
         return $this->belongsToMany(Store::class,
-        'store_users',
-        'user_id',
-        'store_id');
+            'store_users',
+            'user_id',
+            'store_id');
     }
-    Public function Owned()
+
+    public function Owned(): HasMany
     {
         return $this->hasMany(Store::class, 'owner_id');
     }
-    Public function Location()
+
+    public function Location(): BelongsToMany
     {
-        return $this->belongsTo(Location::class, 'location_id');
+        return $this->belongsToMany(Location::class, 'user_locations', 'user_id', 'location_id');
     }
-    Public function SocialMedia()
+
+    public function SocialMedia(): BelongsTo
     {
         return $this->belongsTo(SocialMedia::class, 'social_media_id');
     }

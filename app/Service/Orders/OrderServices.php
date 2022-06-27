@@ -4,6 +4,7 @@ namespace App\Service\Orders;
 
 use App\Http\Requests\Plan\PlanRequest;
 use App\Models\Orders\Order;
+use App\Models\Orders\Order_Details;
 use App\Models\Payment\Payment_Method;
 use App\Models\Stores\Store;
 use App\Traits\GeneralTrait;
@@ -18,13 +19,15 @@ class OrderServices
 {
     private $payments;
     private $storemodel;
+    private $order_details;
     private $PAGINATION_COUNT;
 
     use GeneralTrait;
 
-    public function __construct(Order $order, Store $storemodel)
+    public function __construct(Order $order, Store $storemodel, OrderDetailsService $order_details)
     {
         $this->order = $order;
+        $this->order_details = $order_details;
         $this->storemodel = $storemodel;
     }
 
@@ -46,10 +49,9 @@ class OrderServices
         try {
             if ($request->has('payments')) {
                 $store = $this->storemodel->find($storeId);
-                if(is_null($store) )
-                {
+                if (is_null($store)) {
                     $this->returnSuccessMessage('Store', 'stores doesnt exist yet');
-                }else
+                } else
                     $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
                 $store_payment = $store->with('Payment_Method')->get();
                 return $this->returnData('payments', $store_payment, 'done');
@@ -164,11 +166,12 @@ class OrderServices
     /****  Create plan   ***
      * @return JsonResponse
      */
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         try {
+            $details = collect($request->order_details);
             DB::beginTransaction();
-            $order = $this->order->insertGetId([
+             $order_id = $this->order->insertGetId([
                 'user_id' => $request['user_id'],
                 'Payment_Method_id' => $request['Payment_Method_id'],
                 'shipping_id' => $request['shipping_id'],
@@ -176,11 +179,20 @@ class OrderServices
                 'state' => $request['state'],
                 'is_active' => 1
             ]);
+            if ($request->has('Store')) {
+                $order = $this->order->find($order_id);
+                $order->Store()->syncWithoutDetaching($request->get('Store'));
+            }
+            if (isset($details) && count($details) > 0) {
+                foreach ($details as $detail) {
+                    $this->order_details->create($detail,$order_id);
+                }
+            }
             DB::commit();
-            return $this->returnData('Order', $order, 'done');
+            return $this->returnSuccessMessage('Order',  '200');
         } catch (\Exception $ex) {
             DB::rollback();
-            return $this->returnError('plan', $ex->getMessage());
+            return $this->returnError('Order', $ex->getMessage());
         }
     }
     /*__________________________________________________________________*/

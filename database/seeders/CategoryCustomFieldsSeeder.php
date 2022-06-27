@@ -16,7 +16,7 @@ class CategoryCustomFieldsSeeder extends Seeder
     {
         for($category_id=1;$category_id<5;$category_id++){
             for($custom_field_id=1;$custom_field_id<5;$custom_field_id++) {
-                DB::table('category_customfields')->insert(
+                DB::table('category_custom_fields')->insert(
                     [
                         'custom_field_id'=>$custom_field_id,
                         'category_id'=>$category_id

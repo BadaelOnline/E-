@@ -519,6 +519,21 @@ Route::group(
             Route::post('/assigning/{storeId}', 'OrdersDetailsController@assigningToStore');
             Route::post('/delete/{storeId}/{paymentId}', 'OrdersDetailsController@deleteFromStore');
             Route::post('/create', 'OrdersController@create');
+            Route::post('/create/{order_id}', 'OrdersDetailsController@create');
+        });
+        Route::group(['prefix' => 'locations', 'namespace' => 'Location'], function () {
+            Route::GET('/get', 'SectionsController@getAll');
+            Route::GET('/getCategoryBySection', 'LocationController@getCategoryBySection');
+            Route::GET('/getById/{id}', 'LocationController@getById');
+            Route::POST('/create', 'LocationController@create');
+            Route::PUT('/update/{id}', 'LocationController@update');
+            Route::PUT('/trash/{id}', 'LocationController@trash');
+            Route::PUT('/restoreTrashed/{id}', 'LocationController@restoreTrashed');
+            Route::GET('/search/{name}', 'LocationController@search');
+            Route::GET('/getTrashed', 'LocationController@getTrashed');
+            Route::DELETE('/delete/{id}', 'LocationController@delete');
+            Route::POST('upload', 'LocationController@upload');
+            Route::post('/upload/{id}', 'LocationController@update_upload');
         });
 
     });

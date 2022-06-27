@@ -8,6 +8,7 @@ use App\Models\Currencies\Currency;
 use App\Models\Images\StoreImage;
 use App\Models\Location\Location;
 use App\Models\Offer\Offer;
+use App\Models\Orders\Order;
 use App\Models\Orders\Order_Details;
 use App\Models\Payment\Payment_Method;
 use App\Models\Plans\Subscription;
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
 class Store extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'id';
     protected $hidden = [
         'created_at', 'updated_at', 'pivot'
@@ -37,7 +39,7 @@ class Store extends Model
         'currency_id', 'location_id', 'social_media_id',
         'activity_type_id', 'owner_id', 'street_id',
         'is_active', 'logo', 'is_approved'
-        , 'is_active', 'section_id','created_at', 'updated_at',
+        , 'is_active', 'section_id', 'created_at', 'updated_at',
     ];
 
     public function getIsActiveAttribute($value)
@@ -128,9 +130,13 @@ class Store extends Model
             'payment_method_id');
     }
 
-    public function Order_Details()
+    public function Order()
     {
-        return $this->hasMany(Order_Details::class, 'store_id');
+        return $this->belongsToMany(
+            Order::class,
+            'store_orders',
+            'store_id',
+            'order_id');
     }
 
     public function Shipping_Method()
@@ -150,7 +156,7 @@ class Store extends Model
             'user_id');
     }
 
-    Public function Owned()
+    public function Owned()
     {
         return $this->hasMany(User::class, 'owner_id');
     }

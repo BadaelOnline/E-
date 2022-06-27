@@ -58,7 +58,8 @@ class DatabaseSeeder extends Seeder
             DetailsCustomValue::class,
             StoreProductsDetails::class,
             ProductCustomValueSeeder::class,
-            CategoryCustomFieldsSeeder::class
+            CategoryCustomFieldsSeeder::class,
+            UserLocationsSeeder::class 
         ]);
 
     }
