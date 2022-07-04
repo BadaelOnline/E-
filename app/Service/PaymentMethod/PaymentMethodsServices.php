@@ -29,7 +29,6 @@ class PaymentMethodsServices
         $this->storemodel = $storemodel;
     }
 
-    /****Get All  plans  ****/
     public function getAll()
     {
         try {
@@ -47,11 +46,10 @@ class PaymentMethodsServices
         try {
             if ($request->has('payments')) {
                 $store = $this->storemodel->find($storeId);
-                if(is_null($store) )
-                {
+                if (is_null($store)) {
                     $this->returnSuccessMessage('Store', 'stores doesnt exist yet');
-                }else
-                $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
+                } else
+                    $store->Payment_Method()->syncWithoutDetaching($request->get('payments'));
                 $store_payment = $store->with('Payment_Method')->get();
                 return $this->returnData('payments', $store_payment, 'done');
             }
@@ -81,14 +79,13 @@ class PaymentMethodsServices
             $this->returnData('store payments method', $store, 'done');
     }
     /*__________________________________________________________________*/
-    /****Get Active plan By ID  ***
+    /****getById  ***
      * @param $id
      * @return JsonResponse
      */
     public function getById($id)
     {
         try {
-//            Gate::authorize('Read Brand');
             $plan = $this->plan->findOrFail($id);
             if (!isset($plan)) {
                 return $this->returnSuccessMessage('This plan not found', 'done');
@@ -99,12 +96,10 @@ class PaymentMethodsServices
                 return $this->returnError('400', $ex->getMessage());
             }
             return $this->returnError('400', $ex->getMessage());
-
         }
     }
+
     /*__________________________________________________________________*/
-    /****ــــــ This Functions For Trashed plan  ****/
-    /****Get All Trashed plan Or By ID  ****/
     public function getTrashed()
     {
         try {
@@ -162,10 +157,10 @@ class PaymentMethodsServices
         }
     }
     /*__________________________________________________________________*/
-    /****  Create plan   ***
+    /****  Create payment method   ***
      * @return JsonResponse
      */
-    public function create(PlanRequest $request)
+    public function create(Request $request)
     {
         try {
             $request->validated();
@@ -199,12 +194,12 @@ class PaymentMethodsServices
         }
     }
     /*__________________________________________________________________*/
-    /****  Update plan   ***
-     * @param PlanRequest $request
+    /****  Update    ***
+     * @param Request $request
      * @param $id
      * @return JsonResponse
      */
-    public function update(PlanRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $request->validated();
         try {
@@ -239,7 +234,7 @@ class PaymentMethodsServices
         }
     }
     /*__________________________________________________________________*/
-    /****  Delete plan   ***
+    /****  Delete   ***
      * @param $id
      * @return JsonResponse
      */

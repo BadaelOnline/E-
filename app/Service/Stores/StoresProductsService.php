@@ -52,11 +52,17 @@ class StoresProductsService
     public function viewProductByCategory($category_id): JsonResponse
     {
         try {
-            $product = $this->category->getCategoryProductsList()->find($category_id);
+            $product = $this->category->with(['Product' => function ($q) {
+                return $q->with(['StoreProduct' => function ($q) {
+                    return $q->with(['StoreProductDetails' => function ($q) {
+                        return $q->with(['Custom_Field_Value'])->get();
+                    }])->get();
+                }])->get();
+            }])->find($category_id);
             if (is_null($product)) {
-                return $this->returnSuccessMessage('This Product not found', 'done');
+                return $this->returnSuccessMessage('This Product Not Found', 'done');
             } else {
-                return $this->returnData('Category', $product, 'done');
+                return $this->returnData('Products In Category', $product, 'done');
             }
         } catch (\Exception $ex) {
             return $this->returnError('400', $ex->getMessage());
