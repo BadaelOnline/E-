@@ -12,51 +12,64 @@ use Illuminate\Http\Request;
 class OrdersDetailsController extends Controller
 {
     use GeneralTrait;
+
     private $details;
+
     public function __construct(OrderDetailsService $details)
     {
-        $this->details=$details;
+        $this->details = $details;
     }
+
     public function getAll()
     {
         return $this->details->getAll();
     }
-    public function assigningToStore(Request $request,$storeId)
+
+    public function assigningToStore(Request $request, $storeId)
     {
-        return $this->details->assigningToStore($request,$storeId);
+        return $this->details->assigningToStore($request, $storeId);
     }
-    public function deleteFromStore($paymentId,$storeId)
+
+    public function deleteFromStore($paymentId, $storeId)
     {
         return $this->details->deleteFromStore($storeId);
     }
+
     public function getByStore($storeId)
     {
         return $this->details->getByStore($storeId);
     }
+
     public function getById($id)
     {
         return $this->details->getById($id);
     }
+
     public function getTrashed()
     {
         return $this->details->getTrashed();
     }
-    public function create(Request $request , $order_id)
+
+    public function create(Request $request, $order_id)
     {
-        return $this->details->create($request , $order_id);
+        return $this->details->create($request, $order_id);
     }
-    public function update(PlanRequest $request,$id)
+
+    public function update(PlanRequest $request, $id)
     {
-        return $this->details->update($request,$id);
+        return $this->details->update($request, $id);
     }
+
     public function trash($id)
     {
         return $this->details->trash($id);
     }
+
     public function restoreTrashed($id)
     {
         return $this->details->restoreTrashed($id);
     }
+
     public function delete($id)
     {
         return $this->details->delete($id);

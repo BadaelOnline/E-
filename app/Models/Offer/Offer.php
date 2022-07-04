@@ -18,34 +18,33 @@ class Offer extends Model
     protected $table = 'offers';
     protected $fillable = ['id', 'user_email', 'offer_price', 'selling_quantity'
         , 'started_at', 'ended_at', 'is_active', 'is_offer'];
-
-    protected $hidden = ['created_at', 'updated_at','pivot'];
+    protected $hidden = ['created_at', 'updated_at', 'pivot'];
 
     //local scope
-    public function scopeNotActive ($query)
+    public function scopeNotActive($query)
     {
-        return $query->where ('is_active', 0)->get ();
+        return $query->where('is_active', 0)->get();
     }
 
-    public function scopeAdvertisement ($query)
+    public function scopeAdvertisement($query)
     {
-        return $query->select ('id')->where ('is_active', 1)->get ();
+        return $query->select('id')->where('is_active', 1)->get();
     }
 
-    protected static function booted ()
+    protected static function booted()
     {
-        parent::booted ();
-        static::addGlobalScope (new OfferScope);
+        parent::booted();
+        static::addGlobalScope(new OfferScope);
     }
 
-    public function OfferTranslation ()
+    public function OfferTranslation()
     {
-        return $this->hasMany (OfferTranslation::class,'offer_id');
+        return $this->hasMany(OfferTranslation::class, 'offer_id');
     }
 
-    public function StoreProductDetails ()
+    public function StoreProductDetails()
     {
-        return $this->belongsToMany (
+        return $this->belongsToMany(
             StoreProductDetails::class,
             'store_products_offers',
             'offer_id',
@@ -53,14 +52,14 @@ class Offer extends Model
         );
     }
 
-    public function scopeGetStoreProductsList ($query)
+    public function scopeGetStoreProductsList($query)
     {
-        return $query->with(['StoreProductDetails' => function ($q){
-            return $q->with(['StoreProduct'=> function($q1){
+        return $query->with(['StoreProductDetails' => function ($q) {
+            return $q->with(['StoreProduct' => function ($q1) {
                 return $q1
-                    ->join('stores', 'stores_products.store_id', '=','stores.id' )
-                    ->join('store_translations', 'stores.id', '=','store_translations.store_id' )
-                    ->where('store_translations.local','=',Config::get('app.locale'))
+                    ->join('stores', 'stores_products.store_id', '=', 'stores.id')
+                    ->join('store_translations', 'stores.id', '=', 'store_translations.store_id')
+                    ->where('store_translations.local', '=', Config::get('app.locale'))
                     ->select([
                         'stores.id',
                         'stores.logo',

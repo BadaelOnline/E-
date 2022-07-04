@@ -13,8 +13,10 @@ use DataTables;
 class OfferService
 {
     use GeneralTrait;
+
     protected $OfferModel;
     protected $StoreModel;
+
     public function __construct(Offer $offer, Store $store)
     {
         $this->OfferModel = $offer;
@@ -57,10 +59,11 @@ class OfferService
         }
     }
 
-    public function create(){
+    public function create()
+    {
         return view('admin.offers.create');
     }
-    
+
     public function store($request)
     {
         try {
@@ -101,7 +104,8 @@ class OfferService
         }
     }
 
-    public function edit(){
+    public function edit()
+    {
     }
 
     public function update(OfferRequest $request, $id)
@@ -130,7 +134,7 @@ class OfferService
                 'is_offer' => $request->is_offer,
             ]);
             $db_offers = array_values(OfferTranslation::where('offer_translations.offer_id', $id)
-                    ->get()->all());
+                ->get()->all());
             $dboffers = (array_values($db_offers));
             $offers = (array_values($request->Offer));
             foreach ($dboffers as $dboffer) {
