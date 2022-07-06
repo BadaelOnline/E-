@@ -168,7 +168,7 @@ Route::group(
             Route::GET('/product-category/{category_id}', 'StoresProductsController@viewProductByCategory');
             Route::GET('/product-category-details/{product_id}', 'StoresProductsController@viewProductByCategoryDetails');
             Route::GET('/product-details/{product_id}', 'StoresProductsController@viewProductsDetailsInStore');
-            Route::GET('/viewStoresHasProduct/{id}', 'StoresProductsController@viewStoresHasProduct');
+            Route::GET('/products-store/{id}', 'StoresProductsController@viewStoresHasProduct');
             Route::GET('/rangeOfPrice/{id}', 'StoresProductsController@rangeOfPrice');
             Route::PUT('/prices/{store_id}', 'StoresProductsController@updateMultyProductsPricesInStore');
             Route::PUT('/ratio/{store_id}', 'StoresProductsController@updatePricesPyRatio');
