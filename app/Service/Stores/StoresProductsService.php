@@ -38,7 +38,9 @@ class StoresProductsService
     public function viewStoresHasProduct($id): JsonResponse
     {
         try {
-            $product = $this->productModel->with('Store')->find($id);
+            $product = $this->productModel->with(['StoreProduct'=> function($q){
+                return $q->with(['Store','StoreProductDetails'])->get();
+            }])->find($id);
             if (is_null($product)) {
                 return $this->returnSuccessMessage('This Product not found', 'done');
             } else {
